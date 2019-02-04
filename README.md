@@ -28,10 +28,10 @@ Requirements: [Node.js v10](https://nodejs.org/en/download/ "Install Node.js v10
 ### Install dependencies
 ```shell
 # Ubuntu
-	sudo apt-get install libmtp-dev
+sudo apt-get install libmtp-dev
 	
 # macOS
-	brew install libmtp
+brew install libmtp
 ```
 
 ### Clone
