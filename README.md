@@ -51,6 +51,9 @@ $ yarn run build-node-gyp
 ```
 
 ### Run
+
+Find usage examples in *run.js*
+
 ```shell
 $ node run.js
 ```
