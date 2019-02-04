@@ -1,8 +1,8 @@
 {
   "name": "mtp-nodejs-port",
-  "productName": "MTP Port for Node.js",
+  "productName": "MTP Port for Node.js - Native addon",
   "version": "0.0.1",
-  "description": "MTP Port for Node.js",
+  "description": "MTP Port for Node.js - Native addon",
   "main": "index.js",
   "scripts": {
     "autogypi": "autogypi",

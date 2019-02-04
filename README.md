@@ -1,15 +1,15 @@
-# MTP Port for node.js
+# MTP Port for Node.js - Native addon
 
 - Author: [Ganesh Rathinavel](https://www.linkedin.com/in/ganeshrvel "Ganesh Rathinavel")
-- License: [MIT](https://github.com/ganeshrvel/mtp-nodejs-port/blob/master/LICENSE "MIT")
+- License: [MIT](https://github.com/ganeshrvel/mtp-nodejs-port-native-addon/blob/master/LICENSE "MIT")
 - System Requirements: macOS v10.10 or higher, libmtp
-- Repo URL: [https://github.com/ganeshrvel/mtp-nodejs-port](https://github.com/ganeshrvel/mtp-nodejs-port/ "https://github.com/ganeshrvel/mtp-nodejs-port")
+- Repo URL: [https://github.com/ganeshrvel/mtp-nodejs-port-native-addon](https://github.com/ganeshrvel/mtp-nodejs-port-native-addon/ "https://github.com/ganeshrvel/mtp-nodejs-port-native-addon")
 - Contacts: ganeshrvel@outlook.com
 
 
 ### Introduction
 
-##### MTP Port for Node.js
+##### MTP Port for Node.js - Native addon
 
 Access Android phones and other MTP devices using Node.js. This project uses N-API wrapper around the libmtp library. It uses version 3 of N-API which is only available on Node.js v10 and higher.
 
@@ -36,9 +36,9 @@ brew install libmtp
 
 ### Clone
 ```shell
-$ git clone --depth 1 --single-branch --branch master https://github.com/ganeshrvel/mtp-nodejs-port.git
+$ git clone --depth 1 --single-branch --branch master https://github.com/ganeshrvel/mtp-nodejs-port-native-addon.git
 
-$ cd mtp-nodejs-port
+$ cd mtp-nodejs-port-native-addon
 ```
 
 ```shell
@@ -77,7 +77,7 @@ $ node run.js
 - Make sure your code lints.
 - Issue a pull request!
 
-When you submit code changes, your submissions are understood to be under the same [MIT License](https://github.com/ganeshrvel/mtp-nodejs-port/blob/master/LICENSE "MIT License") that covers the project. Feel free to contact the maintainers if that's a concern.
+When you submit code changes, your submissions are understood to be under the same [MIT License](https://github.com/ganeshrvel/mtp-nodejs-port-native-addon/blob/master/LICENSE "MIT License") that covers the project. Feel free to contact the maintainers if that's a concern.
 
 
 ### Buy me a coffee
@@ -88,6 +88,6 @@ Paypal me: [paypal.me/ganeshrvel](https://paypal.me/ganeshrvel "paypal.me/ganesh
 Please feel free to contact me at ganeshrvel@outlook.com
 
 ### License
-MTP Port for node.js is released under [MIT License](https://github.com/ganeshrvel/mtp-nodejs-port/blob/master/LICENSE "MIT License").
+MTP Port for node.js - Native addon is released under [MIT License](https://github.com/ganeshrvel/mtp-nodejs-port-native-addon/blob/master/LICENSE "MIT License").
 
 Copyright © 2018-Present Ganesh Rathinavel
