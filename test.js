@@ -31,6 +31,7 @@ async function run(resetmtp = false, searchDir = null) {
 
   if (setStorageDevicesError) {
     console.error(setStorageDevicesError);
+    return;
   }
 
   if (resetmtp) {
@@ -43,27 +44,47 @@ async function run(resetmtp = false, searchDir = null) {
     });
 
     if (listMtpFileTreeError) {
-      console.log(listMtpFileTreeError);
+      console.error(listMtpFileTreeError);
       return;
     }
 
     if (searchDir) {
-      console.log(findLodash(listMtpFileTreeData, { name: searchDir }));
+      console.error(findLodash(listMtpFileTreeData, { name: searchDir }));
       return;
     }
 
-    console.log(listMtpFileTreeData);
+    console.error(listMtpFileTreeData);
     return;
   }
 
-  /*const listMtpFileTree = await mtpObj.listMtpFileTree({
-    folderId: 49,
+  /*const {
+    error: listMtpFileTreeError,
+    data: listMtpFileTreeData
+  } = await mtpObj.listMtpFileTree({
+    folderId: 34,
     recursive: true,
     parentPath: '/'
-  });*/
+  });
 
-  //console.log(listMtpFileTree);
-  //todo: handle error here
+  if (listMtpFileTreeError) {
+    console.error(listMtpFileTreeError);
+    return;
+  }
+  console.log(listMtpFileTreeData);*/
+
+  const {
+    error: listLocalFileTreeError,
+    data: listLocalFileTreeData
+  } = await mtpObj.listLocalFileTree({
+    folderPath: '/Users/ganeshr/Desktop/2',
+    recursive: true
+  });
+
+  if (listLocalFileTreeError) {
+    console.error(listLocalFileTreeError);
+    return;
+  }
+  console.log(listLocalFileTreeData);
 
   //await mtpObj.deleteFile({ fileId: 57 });
   //todo: handle error here
