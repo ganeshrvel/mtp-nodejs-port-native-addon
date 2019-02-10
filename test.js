@@ -72,7 +72,7 @@ async function run(resetmtp = false, searchDir = null) {
   }
   console.log(listMtpFileTreeData);*/
 
-  const {
+/*  const {
     error: listLocalFileTreeError,
     data: listLocalFileTreeData
   } = await mtpObj.listLocalFileTree({
@@ -84,7 +84,7 @@ async function run(resetmtp = false, searchDir = null) {
     console.error(listLocalFileTreeError);
     return;
   }
-  console.log(listLocalFileTreeData);
+  console.log(listLocalFileTreeData);*/
 
   //await mtpObj.deleteFile({ fileId: 57 });
   //todo: handle error here
