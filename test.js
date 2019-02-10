@@ -165,6 +165,26 @@ async function run(resetmtp = false, searchDir = null) {
 
   /**
    * =====================================================================
+   * Create Folder
+   */
+  /*
+  const {
+    error: createFolderError,
+    data: createFolderData
+  } = await mtpObj.createFolder({
+    newFolderName: 'ABCD',
+    parentId: MTP_FLAGS.FILES_AND_FOLDERS_ROOT
+  });
+
+  if (createFolderError) {
+    console.error(createFolderError);
+  }
+  if (createFolderData) {
+    console.log(createFolderData);
+  }*/
+
+  /**
+   * =====================================================================
    * Download file tree
    */
 
