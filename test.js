@@ -116,7 +116,7 @@ async function run(resetmtp = false, searchDir = null) {
    * =====================================================================
    * Rename File
    */
-  const {
+  /*  const {
     error: renameFileError,
     data: renameFileData
   } = await mtpObj.renameFile({
@@ -126,7 +126,7 @@ async function run(resetmtp = false, searchDir = null) {
 
   if (renameFileError) {
     console.error(renameFileError);
-  }
+  }*/
 
   /**
    * =====================================================================
@@ -142,6 +142,31 @@ async function run(resetmtp = false, searchDir = null) {
     console.error(getFileInfoError);
   }
   console.log(getFileInfoData.name);*/
+
+  /**
+   * =====================================================================
+   * File Exists
+   */
+
+  /*  const {
+    error: fileExistsError,
+    data: fileExistsData
+  } = await mtpObj.fileExists({
+    fileName: 'Files',
+    parentId: MTP_FLAGS.FILES_AND_FOLDERS_ROOT
+  });
+
+  if (fileExistsError) {
+    console.error(fileExistsError);
+  }
+  if (fileExistsData) {
+    console.log(fileExistsData.name);
+  }*/
+
+  /**
+   * =====================================================================
+   * File Exists
+   */
 
   /*const downloadFileTree = await mtpObj.downloadFileTree({
    nodes: listMtpFileTree,
