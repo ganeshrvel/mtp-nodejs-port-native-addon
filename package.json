@@ -3,12 +3,13 @@
   "productName": "MTP Port for Node.js - Native addon",
   "version": "0.0.1",
   "description": "MTP Port for Node.js - Native addon",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "autogypi": "autogypi",
     "node-gyp": "node-gyp",
     "install": "npm run build-node-gyp",
-    "build-node-gyp": "npm run autogypi && node-gyp configure build"
+    "build-node-gyp": "npm run autogypi && node-gyp configure build",
+    "dev": "node --inspect run.js"
   },
   "keywords": [
     "mtp",
@@ -28,9 +29,13 @@
   "gypfile": true,
   "dependencies": {
     "autogypi": "^0.2.2",
+    "junk": "^2.1.0",
+    "lodash": "^4.17.11",
+    "mkdirp": "^0.5.1",
     "nbind": "^0.3.6",
     "node-gyp": "^3.3.1",
-    "prebuild": "^8.1.2"
+    "prebuild": "^8.1.2",
+    "recursive-readdir": "^2.2.2"
   },
   "devDependencies": {
     "prettier": "^1.16.4"

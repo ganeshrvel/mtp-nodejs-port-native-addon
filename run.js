@@ -2,6 +2,10 @@ const mtp = require('.');
 const fs = require('fs');
 const path = require('path');
 
+function undefinedOrNull(_var) {
+  return typeof _var === 'undefined' || _var === null;
+}
+
 function getStorageDevices(device) {
   mtp.Get_Storage(device, mtp.STORAGE_SORTBY_NOTSORTED);
   return new Promise(resolve => {
@@ -44,17 +48,6 @@ function getFile(device, destinationFilePath, fileId) {
   console.log('Uploaded file return code => ', _return);
 }
 
-function fileTree(device, storageId, folderId, indent, recursive = false) {
-  const files = mtp.Get_Files_And_Folders(device, storageId, folderId);
-  files.forEach(file => {
-    console.log(indent, file.id, file.name);
-
-    if (mtp.FILETYPE_FOLDER === file.type && recursive) {
-      fileTree(device, storageId, file.id, indent + ' ', recursive);
-    }
-  });
-}
-
 function createFolder(device, folderPath, parentID, storageId) {
   const _return = mtp.Create_Folder(device, folderPath, parentID, storageId);
 
@@ -71,7 +64,50 @@ function deleteFile(device, fileId) {
   mtp.Destroy_file(device, fileId);
 }
 
+function fileTree({
+  device,
+  storageId,
+  folderId,
+  recursive = false,
+  isRootNode,
+  fileTreeStructure = [],
+  parentPath = '/'
+}) {
+  const files = mtp.Get_Files_And_Folders(device, storageId, folderId);
+  files.forEach(file => {
+    const path = `${parentPath}/${file.name}`;
+    const fileInfo = {
+      id: file.id,
+      name: file.name,
+      size: file.size,
+      isFolder: mtp.FILETYPE_FOLDER === file.type,
+      parentId: file.parentId,
+      type: file.type,
+      storageId: file.storageId,
+      path,
+      children: []
+    };
+
+    const lastIndex = fileTreeStructure.push(fileInfo) - 1;
+
+    if (mtp.FILETYPE_FOLDER === file.type && recursive) {
+      fileTree({
+        device,
+        storageId,
+        folderId: file.id,
+        recursive,
+        isRootNode: false,
+        parentPath,
+        fileTreeStructure: fileTreeStructure[lastIndex].children
+      });
+    }
+  });
+
+  return fileTreeStructure;
+}
+
 mtp.Init();
+
 mtp.Detect_Raw_Devices((err, rawDevices) => {
   if (err) {
     console.log(`MTP fetch exited with an error code => ${err}`);
@@ -100,17 +136,36 @@ mtp.Detect_Raw_Devices((err, rawDevices) => {
         // sendFile(device, storage.id, mtp.FILES_AND_FOLDERS_ROOT, '', false);
 
         // getFile(device, '/test.txt', <file-id>)
-
-        // fileTree(device, storage.id, mtp.FILES_AND_FOLDERS_ROOT, '  ', false);
-
         /*
-          createFolder(
+        console.log(
+          fileTree({
             device,
-            '/test-folder',
-            mtp.FILES_AND_FOLDERS_ROOT,
-            storage.id
-          );
-        */
+            storageId: storage.id,
+            folderId: mtp.FILES_AND_FOLDERS_ROOT,
+            recursive: false,
+            isRootNode: true
+          })
+        ); */
+
+        const _file = fileTree({
+          device,
+          storageId: storage.id,
+          folderId: 45, // mtp.FILES_AND_FOLDERS_ROOT, // 54, //54, mtp.FILES_AND_FOLDERS_ROOT, //
+          recursive: true,
+          isRootNode: true,
+          parentPath: '/A'
+        });
+
+        //console.log(_file);
+        console.log(JSON.stringify(_file));
+        //  console.log(fileTree(device, storage.id, 42, true, {}));
+
+        /*        createFolder(
+          device,
+          '/test-folder',
+          mtp.FILES_AND_FOLDERS_ROOT,
+          storage.id
+        );*/
 
         // renameFile(device, <file-id>, '/test.txt');
 
