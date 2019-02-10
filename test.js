@@ -9,6 +9,7 @@ mtpObj.init();
 
 async function run(resetmtp = false, searchDir = null) {
   /**
+   * =====================================================================
    * Detect MTP
    */
   const {
@@ -22,6 +23,7 @@ async function run(resetmtp = false, searchDir = null) {
   }
 
   /**
+   * =====================================================================
    * Set Storage Devices
    */
   const {
@@ -57,12 +59,17 @@ async function run(resetmtp = false, searchDir = null) {
     return;
   }
 
-  /*const {
+  /**
+   * =====================================================================
+   * List MTP File Tree
+   */
+
+  /*  const {
     error: listMtpFileTreeError,
     data: listMtpFileTreeData
   } = await mtpObj.listMtpFileTree({
     folderId: 34,
-    recursive: true,
+    recursive: false,
     parentPath: '/'
   });
 
@@ -72,7 +79,12 @@ async function run(resetmtp = false, searchDir = null) {
   }
   console.log(listMtpFileTreeData);*/
 
-/*  const {
+  /**
+   * =====================================================================
+   * List Local File Tree
+   */
+
+  /*  const {
     error: listLocalFileTreeError,
     data: listLocalFileTreeData
   } = await mtpObj.listLocalFileTree({
@@ -86,8 +98,19 @@ async function run(resetmtp = false, searchDir = null) {
   }
   console.log(listLocalFileTreeData);*/
 
-  //await mtpObj.deleteFile({ fileId: 57 });
-  //todo: handle error here
+  /**
+   * =====================================================================
+   * List Delete file
+   */
+
+  /*  const {
+    error: deleteFileError,
+    data: deleteFileData
+  } = await mtpObj.deleteFile({ fileId: 7 });
+
+  if (deleteFileError) {
+    console.error(deleteFileError);
+  }*/
 
   /*const downloadFileTree = await mtpObj.downloadFileTree({
     nodes: listMtpFileTree,
@@ -115,6 +138,7 @@ async function run(resetmtp = false, searchDir = null) {
   //todo: handle error here
 
   /**
+   * =====================================================================
    * Release Device
    */
   const {
