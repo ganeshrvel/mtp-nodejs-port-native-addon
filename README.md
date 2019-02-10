@@ -52,10 +52,14 @@ $ yarn run build-node-gyp
 
 ### Run
 
-Find usage examples in *run.js*
+Find usage examples in *test.js*
 
 ```shell
-$ node run.js
+$ node test.js
+
+// to refresh the MTP
+$ node test.js resetmtp
+
 ```
 
 ### More repos

@@ -1,7 +1,7 @@
 {
   "name": "mtp-nodejs-port",
   "productName": "MTP Port for Node.js - Native addon",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "MTP Port for Node.js - Native addon",
   "main": "lib/index.js",
   "scripts": {
@@ -33,9 +33,7 @@
     "lodash": "^4.17.11",
     "mkdirp": "^0.5.1",
     "nbind": "^0.3.6",
-    "node-gyp": "^3.3.1",
-    "prebuild": "^8.1.2",
-    "recursive-readdir": "^2.2.2"
+    "node-gyp": "^3.3.1"
   },
   "devDependencies": {
     "prettier": "^1.16.4"
