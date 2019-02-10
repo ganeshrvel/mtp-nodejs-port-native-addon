@@ -227,16 +227,39 @@ async function run(resetmtp = false, searchDir = null) {
    * Upload file tree
    */
 
-  /*const listLocalFileTree = await mtpObj.listLocalFileTree({
-    folderPath: '~/Desktop/2',
+  /*const {
+    error: listLocalFileTreeError,
+    data: listLocalFileTreeData
+  } = await mtpObj.listLocalFileTree({
+    folderPath: '/Users/ganeshr/Desktop/3',
     recursive: true
   });
 
-  const uploadFileTree = await mtpObj.uploadFileTree({
-    nodes: listLocalFileTree,
-    parentId: 49
-  });*/
-  //todo: handle error here
+  if (listLocalFileTreeError) {
+    console.error(listLocalFileTreeError);
+    return;
+  }
+
+  const {
+    error: uploadFileTreeError,
+    data: uploadFileTreeData
+  } = await mtpObj.uploadFileTree({
+    rootNode: true,
+    nodes: listLocalFileTreeData,
+    parentId: 45,
+    callback: ({ sent, total, file }) => {
+      process.stdout.write(
+        `Uploaded file: ${sent} / ${total} of ${file.name}\n`
+      );
+    }
+  });
+
+  if (uploadFileTreeError) {
+    console.error(uploadFileTreeError);
+    return;
+  }
+
+  console.log(uploadFileTreeData);*/
 
   /**
    * =====================================================================
