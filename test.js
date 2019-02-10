@@ -8,10 +8,29 @@ const mtpObj = new MTP();
 mtpObj.init();
 
 async function run(resetmtp = false, searchDir = null) {
-  const detectedDevices = await mtpObj.detectMtp();
-  //todo: handle error here
+  /**
+   * Detect MTP
+   */
+  const {
+    error: detectMtpError,
+    data: detectMtpData
+  } = await mtpObj.detectMtp();
 
-  await mtpObj.setStorageDevices({ deviceIndex: 0 });
+  if (detectMtpError) {
+    console.error(detectMtpError);
+  }
+
+  /**
+   * Set Storage Devices
+   */
+  const {
+    error: setStorageDevicesError,
+    data: setStorageDevicesData
+  } = await mtpObj.setStorageDevices({ deviceIndex: 0 });
+
+  if (setStorageDevicesError) {
+    console.error(setStorageDevicesError);
+  }
 
   if (resetmtp) {
     const listMtpFileTree = await mtpObj.listMtpFileTree({
@@ -65,8 +84,17 @@ async function run(resetmtp = false, searchDir = null) {
   });*/
   //todo: handle error here
 
-  const releaseDevice = await mtpObj.releaseDevice();
-  //todo: handle error here
+  /**
+   * Release Device
+   */
+  const {
+    error: releaseDeviceError,
+    data: releaseDeviceData
+  } = await mtpObj.releaseDevice();
+
+  if (releaseDeviceError) {
+    console.error(releaseDeviceError);
+  }
 }
 
 let resetmtp = false;
