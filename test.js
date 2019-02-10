@@ -165,15 +165,47 @@ async function run(resetmtp = false, searchDir = null) {
 
   /**
    * =====================================================================
-   * File Exists
+   * Download file tree
    */
 
-  /*const downloadFileTree = await mtpObj.downloadFileTree({
-   nodes: listMtpFileTree,
-   destinationFilePath: `~/Desktop/2`
- });
- */
-  //todo: handle error here
+  /*  const {
+    error: listMtpFileTreeError,
+    data: listMtpFileTreeData
+  } = await mtpObj.listMtpFileTree({
+    folderId: 34,
+    recursive: true,
+    parentPath: '/'
+  });
+
+  if (listMtpFileTreeError) {
+    console.error(listMtpFileTreeError);
+    return;
+  }
+
+  const {
+    error: downloadFileTreeError,
+    data: downloadFileTreeData
+  } = await mtpObj.downloadFileTree({
+    rootNode: true,
+    nodes: listMtpFileTreeData,
+    destinationFilePath: `/Users/ganeshr/Desktop/3`,
+    callback: ({ sent, total, file }) => {
+      process.stdout.write(
+        `Downloaded file: ${sent} / ${total} of ${file.name}\n`
+      );
+    }
+  });
+  if (downloadFileTreeError) {
+    console.error(downloadFileTreeError);
+    return;
+  }
+
+  console.log(downloadFileTreeData);*/
+
+  /**
+   * =====================================================================
+   * Upload file tree
+   */
 
   /*const listLocalFileTree = await mtpObj.listLocalFileTree({
     folderPath: '~/Desktop/2',
