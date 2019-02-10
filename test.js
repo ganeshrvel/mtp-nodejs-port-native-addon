@@ -18,6 +18,7 @@ async function run(resetmtp = false, searchDir = null) {
 
   if (detectMtpError) {
     console.error(detectMtpError);
+    return;
   }
 
   /**
