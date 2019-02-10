@@ -33,17 +33,25 @@ async function run(resetmtp = false, searchDir = null) {
   }
 
   if (resetmtp) {
-    const listMtpFileTree = await mtpObj.listMtpFileTree({
+    const {
+      error: listMtpFileTreeError,
+      data: listMtpFileTreeData
+    } = await mtpObj.listMtpFileTree({
       folderId: MTP_FLAGS.FILES_AND_FOLDERS_ROOT,
       recursive: false
     });
 
-    if (searchDir) {
-      console.log(findLodash(listMtpFileTree, { name: searchDir }));
+    if (listMtpFileTreeError) {
+      console.log(listMtpFileTreeError);
       return;
     }
 
-    console.log(listMtpFileTree);
+    if (searchDir) {
+      console.log(findLodash(listMtpFileTreeData, { name: searchDir }));
+      return;
+    }
+
+    console.log(listMtpFileTreeData);
     return;
   }
 
