@@ -112,11 +112,42 @@ async function run(resetmtp = false, searchDir = null) {
     console.error(deleteFileError);
   }*/
 
-  /*const downloadFileTree = await mtpObj.downloadFileTree({
-    nodes: listMtpFileTree,
-    destinationFilePath: `~/Desktop/2`
+  /**
+   * =====================================================================
+   * Rename File
+   */
+  const {
+    error: renameFileError,
+    data: renameFileData
+  } = await mtpObj.renameFile({
+    fileId: 35,
+    newfileName: '_ABCD'
   });
-  */
+
+  if (renameFileError) {
+    console.error(renameFileError);
+  }
+
+  /**
+   * =====================================================================
+   * Get file info
+   */
+
+  /*  const {
+    error: getFileInfoError,
+    data: getFileInfoData
+  } = await mtpObj.getFileInfo({ fileId: 57 });
+
+  if (getFileInfoError) {
+    console.error(getFileInfoError);
+  }
+  console.log(getFileInfoData.name);*/
+
+  /*const downloadFileTree = await mtpObj.downloadFileTree({
+   nodes: listMtpFileTree,
+   destinationFilePath: `~/Desktop/2`
+ });
+ */
   //todo: handle error here
 
   /*const listLocalFileTree = await mtpObj.listLocalFileTree({
@@ -127,13 +158,6 @@ async function run(resetmtp = false, searchDir = null) {
   const uploadFileTree = await mtpObj.uploadFileTree({
     nodes: listLocalFileTree,
     parentId: 49
-  });*/
-  //todo: handle error here
-
-  /*mtpObj.renameFile({
-    fileId: 49,
-    newfileName: 'ABCD',
-    parentId: MTP_FLAGS.FILES_AND_FOLDERS_ROOT
   });*/
   //todo: handle error here
 
