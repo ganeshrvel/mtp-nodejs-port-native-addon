@@ -29,7 +29,7 @@ async function run(resetmtp = false, searchDir = null) {
   const {
     error: setStorageDevicesError,
     data: setStorageDevicesData
-  } = await mtpObj.setStorageDevices({ deviceIndex: 0 });
+  } = await mtpObj.setStorageDevices({ storageIndex: 0 });
 
   if (setStorageDevicesError) {
     console.error(setStorageDevicesError);

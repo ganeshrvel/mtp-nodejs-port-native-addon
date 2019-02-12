@@ -9,7 +9,7 @@
 
 ### Introduction
 
-##### MTP Port for Node.js - Native addon
+##### MTP Kernel for Node.js - Native addon
 
 Access Android phones and other MTP devices using Node.js. This project uses N-API wrapper around the libmtp library. It uses version 3 of N-API which is only available on Node.js v10 and higher.
 
