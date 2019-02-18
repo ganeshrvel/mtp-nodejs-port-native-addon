@@ -133,19 +133,17 @@ async function run(resetmtp = false, searchDir = null) {
    * =====================================================================
    * Rename File
    */
-  /*
-  const {
+  /*  const {
     error: renameFileError,
     data: renameFileData
   } = await mtpObj.renameFile({
     filePath: '/ABCD',
-    newfileName: ''
+    newfileName: 'ABDC'
   });
 
   if (renameFileError) {
     console.error(renameFileError);
-  }
-*/
+  }*/
 
   /**
    * =====================================================================
@@ -203,7 +201,7 @@ async function run(resetmtp = false, searchDir = null) {
    * Download file tree
    */
 
- /* const {
+  /* const {
     error: listMtpFileTreeError,
     data: listMtpFileTreeData
   } = await mtpObj.listMtpFileTree({
