@@ -36,7 +36,7 @@ async function run(resetmtp = false, searchDir = null) {
     return;
   }
 
-  if (resetmtp) {
+  /* if (resetmtp) {
     const {
       error: listMtpFileTreeError,
       data: listMtpFileTreeData
@@ -57,20 +57,37 @@ async function run(resetmtp = false, searchDir = null) {
 
     console.error(listMtpFileTreeData);
     return;
+  }*/
+
+  /**
+   * =====================================================================
+   * Resolve Path
+   */
+
+  /*  const {
+    error: resolvePathError,
+    data: resolvePathData
+  } = await mtpObj.resolvePath({
+    filePath: '/ABCD/'
+  });
+
+  if (resolvePathError) {
+    console.error(resolvePathError);
+    return;
   }
+  console.log(resolvePathData);*/
 
   /**
    * =====================================================================
    * List MTP File Tree
    */
 
-  /*  const {
+  /* const {
     error: listMtpFileTreeError,
     data: listMtpFileTreeData
   } = await mtpObj.listMtpFileTree({
-    folderId: 34,
-    recursive: false,
-    parentPath: '/'
+    recursive: true,
+    folderPath: '/ABCD'
   });
 
   if (listMtpFileTreeError) {
@@ -88,7 +105,7 @@ async function run(resetmtp = false, searchDir = null) {
     error: listLocalFileTreeError,
     data: listLocalFileTreeData
   } = await mtpObj.listLocalFileTree({
-    folderPath: '/Users/ganeshr/Desktop/2',
+    folderPath: '/Users/ganeshr/Desktop/3',
     recursive: true
   });
 
@@ -103,10 +120,10 @@ async function run(resetmtp = false, searchDir = null) {
    * List Delete file
    */
 
-  /*  const {
+  /*    const {
     error: deleteFileError,
     data: deleteFileData
-  } = await mtpObj.deleteFile({ fileId: 7 });
+  } = await mtpObj.deleteFile({ filePath: '/ABCD' });
 
   if (deleteFileError) {
     console.error(deleteFileError);
@@ -116,17 +133,19 @@ async function run(resetmtp = false, searchDir = null) {
    * =====================================================================
    * Rename File
    */
-  /*  const {
+  /*
+  const {
     error: renameFileError,
     data: renameFileData
   } = await mtpObj.renameFile({
-    fileId: 35,
-    newfileName: '_ABCD'
+    filePath: '/ABCD',
+    newfileName: ''
   });
 
   if (renameFileError) {
     console.error(renameFileError);
-  }*/
+  }
+*/
 
   /**
    * =====================================================================
@@ -136,44 +155,40 @@ async function run(resetmtp = false, searchDir = null) {
   /*  const {
     error: getFileInfoError,
     data: getFileInfoData
-  } = await mtpObj.getFileInfo({ fileId: 57 });
+  } = await mtpObj.getFileInfo({ filePath: '/ABCDE' });
 
   if (getFileInfoError) {
     console.error(getFileInfoError);
   }
-  console.log(getFileInfoData.name);*/
+  console.log(getFileInfoData);*/
 
   /**
    * =====================================================================
    * File Exists
    */
-
-  /*  const {
+  /*
+  const {
     error: fileExistsError,
     data: fileExistsData
   } = await mtpObj.fileExists({
-    fileName: 'Files',
-    parentId: MTP_FLAGS.FILES_AND_FOLDERS_ROOT
+    filePath: '/WhatsApp'
   });
 
   if (fileExistsError) {
     console.error(fileExistsError);
   }
-  if (fileExistsData) {
-    console.log(fileExistsData.name);
-  }*/
+
+  console.log(fileExistsData);*/
 
   /**
    * =====================================================================
    * Create Folder
    */
-  /*
-  const {
+  /*  const {
     error: createFolderError,
     data: createFolderData
   } = await mtpObj.createFolder({
-    newFolderName: 'ABCD',
-    parentId: MTP_FLAGS.FILES_AND_FOLDERS_ROOT
+    newFolderPath: '/ABCD'
   });
 
   if (createFolderError) {
@@ -188,11 +203,11 @@ async function run(resetmtp = false, searchDir = null) {
    * Download file tree
    */
 
-  /*  const {
+ /* const {
     error: listMtpFileTreeError,
     data: listMtpFileTreeData
   } = await mtpObj.listMtpFileTree({
-    folderId: 34,
+    folderPath: '/ABCD',
     recursive: true,
     parentPath: '/'
   });
@@ -227,7 +242,7 @@ async function run(resetmtp = false, searchDir = null) {
    * Upload file tree
    */
 
-  /*const {
+  /*  const {
     error: listLocalFileTreeError,
     data: listLocalFileTreeData
   } = await mtpObj.listLocalFileTree({
@@ -246,7 +261,7 @@ async function run(resetmtp = false, searchDir = null) {
   } = await mtpObj.uploadFileTree({
     rootNode: true,
     nodes: listLocalFileTreeData,
-    parentId: 45,
+    folderPath: '/ABCD',
     callback: ({ sent, total, file }) => {
       process.stdout.write(
         `Uploaded file: ${sent} / ${total} of ${file.name}\n`

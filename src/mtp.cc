@@ -110,6 +110,8 @@ public:
 
     void setStorageId(const uint32_t storageId) { m_file.storage_id = storageId; }
 
+    time_t getModificationDate() { return m_file.modificationdate; }
+
     LIBMTP_file_t *get() { return &m_file; }
 
 private:
@@ -584,6 +586,7 @@ NBIND_CLASS(file_t){
         getset(getSize, setSize);
         getset(getParentId, setParentId);
         getset(getStorageId, setStorageId);
+        getter(getModificationDate);
 }
 
 NBIND_CLASS(folder_t){
