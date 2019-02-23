@@ -1,5 +1,6 @@
 'use strict';
 
+
 const MTP = require('./lib').MTP;
 const findLodash = require('lodash/find');
 const MTP_FLAGS = require('./lib/mtp-device-flags').FLAGS;
@@ -82,7 +83,7 @@ async function run(resetmtp = false, searchDir = null) {
    * List MTP File Tree
    */
 
-  /* const {
+  const {
     error: listMtpFileTreeError,
     data: listMtpFileTreeData
   } = await mtpObj.listMtpFileTree({
@@ -94,7 +95,7 @@ async function run(resetmtp = false, searchDir = null) {
     console.error(listMtpFileTreeError);
     return;
   }
-  console.log(listMtpFileTreeData);*/
+  console.log(listMtpFileTreeData);
 
   /**
    * =====================================================================
@@ -207,7 +208,6 @@ async function run(resetmtp = false, searchDir = null) {
   } = await mtpObj.listMtpFileTree({
     folderPath: '/ABCD',
     recursive: true,
-    parentPath: '/'
   });
 
   if (listMtpFileTreeError) {
@@ -244,7 +244,7 @@ async function run(resetmtp = false, searchDir = null) {
     error: listLocalFileTreeError,
     data: listLocalFileTreeData
   } = await mtpObj.listLocalFileTree({
-    folderPath: '/Users/ganeshr/Desktop/3',
+    filePath: '/Users/ganeshr/Desktop/3',
     recursive: true
   });
 
@@ -259,7 +259,7 @@ async function run(resetmtp = false, searchDir = null) {
   } = await mtpObj.uploadFileTree({
     rootNode: true,
     nodes: listLocalFileTreeData,
-    folderPath: '/ABCD',
+    destinationFilePath: '/ABCD',
     callback: ({ sent, total, file }) => {
       process.stdout.write(
         `Uploaded file: ${sent} / ${total} of ${file.name}\n`
