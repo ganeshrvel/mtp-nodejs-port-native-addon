@@ -1,0 +1,97 @@
+cmake_minimum_required(VERSION 3.13)
+project(mtp_nodejs_port_native_addon)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(node_modules/nan)
+include_directories(node_modules/nbind/include)
+include_directories(node_modules/nbind/include/nbind)
+include_directories(node_modules/nbind/include/nbind/em)
+include_directories(node_modules/nbind/include/nbind/signature)
+include_directories(node_modules/nbind/include/nbind/v8)
+include_directories(src/inc)
+
+add_executable(mtp_nodejs_port_native_addon
+        node_modules/nan/nan.h
+        node_modules/nan/nan_callbacks.h
+        node_modules/nan/nan_callbacks_12_inl.h
+        node_modules/nan/nan_callbacks_pre_12_inl.h
+        node_modules/nan/nan_converters.h
+        node_modules/nan/nan_converters_43_inl.h
+        node_modules/nan/nan_converters_pre_43_inl.h
+        node_modules/nan/nan_define_own_property_helper.h
+        node_modules/nan/nan_implementation_12_inl.h
+        node_modules/nan/nan_implementation_pre_12_inl.h
+        node_modules/nan/nan_json.h
+        node_modules/nan/nan_maybe_43_inl.h
+        node_modules/nan/nan_maybe_pre_43_inl.h
+        node_modules/nan/nan_new.h
+        node_modules/nan/nan_object_wrap.h
+        node_modules/nan/nan_persistent_12_inl.h
+        node_modules/nan/nan_persistent_pre_12_inl.h
+        node_modules/nan/nan_private.h
+        node_modules/nan/nan_string_bytes.h
+        node_modules/nan/nan_typedarray_contents.h
+        node_modules/nan/nan_weak.h
+        node_modules/nbind/include/nbind/em/ArgFromWire.h
+        node_modules/nbind/include/nbind/em/BindingStd.h
+        node_modules/nbind/include/nbind/em/BindingType.h
+        node_modules/nbind/include/nbind/em/Buffer.h
+        node_modules/nbind/include/nbind/em/Callback.h
+        node_modules/nbind/include/nbind/em/Caller.h
+        node_modules/nbind/include/nbind/em/Creator.h
+        node_modules/nbind/include/nbind/em/External.h
+        node_modules/nbind/include/nbind/em/Int64.h
+        node_modules/nbind/include/nbind/em/NBind.h
+        node_modules/nbind/include/nbind/em/Pool.h
+        node_modules/nbind/include/nbind/em/StdFunction.h
+        node_modules/nbind/include/nbind/em/ValueObj.h
+        node_modules/nbind/include/nbind/signature/BaseSignature.h
+        node_modules/nbind/include/nbind/signature/CallbackSignature.h
+        node_modules/nbind/include/nbind/signature/ConstructorSignature.h
+        node_modules/nbind/include/nbind/signature/FunctionSignature.h
+        node_modules/nbind/include/nbind/signature/GetterSignature.h
+        node_modules/nbind/include/nbind/signature/MethodSignature.h
+        node_modules/nbind/include/nbind/signature/SetterSignature.h
+        node_modules/nbind/include/nbind/signature/SignatureParam.h
+        node_modules/nbind/include/nbind/v8/ArgFromWire.h
+        node_modules/nbind/include/nbind/v8/BindingStd.h
+        node_modules/nbind/include/nbind/v8/BindingType.h
+        node_modules/nbind/include/nbind/v8/BindWrapper.h
+        node_modules/nbind/include/nbind/v8/Buffer.h
+        node_modules/nbind/include/nbind/v8/Callback.h
+        node_modules/nbind/include/nbind/v8/Caller.h
+        node_modules/nbind/include/nbind/v8/Convert.h
+        node_modules/nbind/include/nbind/v8/Creator.h
+        node_modules/nbind/include/nbind/v8/External.h
+        node_modules/nbind/include/nbind/v8/Int64.h
+        node_modules/nbind/include/nbind/v8/NBind.h
+        node_modules/nbind/include/nbind/v8/Output.h
+        node_modules/nbind/include/nbind/v8/Overloader.h
+        node_modules/nbind/include/nbind/v8/StdFunction.h
+        node_modules/nbind/include/nbind/v8/ValueObj.h
+        node_modules/nbind/include/nbind/api.h
+        node_modules/nbind/include/nbind/ArgStorage.h
+        node_modules/nbind/include/nbind/BindClass.h
+        node_modules/nbind/include/nbind/BindDefiner.h
+        node_modules/nbind/include/nbind/Buffer.h
+        node_modules/nbind/include/nbind/common.h
+        node_modules/nbind/include/nbind/FunctionDefiner.h
+        node_modules/nbind/include/nbind/MethodDef.h
+        node_modules/nbind/include/nbind/nbind.h
+        node_modules/nbind/include/nbind/noconflict.h
+        node_modules/nbind/include/nbind/Policy.h
+        node_modules/nbind/include/nbind/TypeID.h
+        node_modules/nbind/include/nbind/TypeStd.h
+        node_modules/nbind/include/nbind/TypeTransformer.h
+        node_modules/nbind/include/nbind/wire.h
+        node_modules/nbind/src/em/Binding.cc
+        node_modules/nbind/src/v8/Binding.cc
+        node_modules/nbind/src/v8/Buffer.cc
+        node_modules/nbind/src/common.cc
+        node_modules/nbind/src/reflect.cc
+        node_modules/node-gyp/gyp/data/win/large-pdb-shim.cc
+        node_modules/node-gyp/src/win_delay_load_hook.cc
+        src/inc/libmtp.c
+        src/inc/libmtp.h
+        src/mtp.cc)

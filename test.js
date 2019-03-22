@@ -6,9 +6,11 @@ const findLodash = require('lodash/find');
 const MTP_FLAGS = require('./lib/mtp-device-flags').FLAGS;
 
 const mtpObj = new MTP();
-mtpObj.init();
+
 
 async function run(resetmtp = false, searchDir = null) {
+  await mtpObj.init();
+
   /**
    * =====================================================================
    * Detect MTP
@@ -23,6 +25,7 @@ async function run(resetmtp = false, searchDir = null) {
     return;
   }
 
+
   /**
    * =====================================================================
    * Set Storage Devices
@@ -36,6 +39,9 @@ async function run(resetmtp = false, searchDir = null) {
     console.error(setStorageDevicesError);
     return;
   }
+
+
+  return;
 
   /* if (resetmtp) {
     const {
@@ -95,8 +101,8 @@ async function run(resetmtp = false, searchDir = null) {
     console.error(listMtpFileTreeError);
     return;
   }
-  console.log(listMtpFileTreeData);
 
+  console.log(listMtpFileTreeData);
   /**
    * =====================================================================
    * List Local File Tree

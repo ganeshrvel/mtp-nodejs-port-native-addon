@@ -78,3 +78,5 @@ build/entitlements.mas.plist
 libmtp.mpd/config.log
 libmtp.mpd/doc/Makefile*
 *.gypi
+build
+cmake-build-debug

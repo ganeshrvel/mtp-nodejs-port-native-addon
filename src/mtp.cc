@@ -5,14 +5,15 @@
 #include <future>
 #include <libgen.h>
 #include <stdlib.h>
-#include <limits.h>
-
-#ifdef _WIN32
-#include <WinSock2.h>
-#endif
+#include <node.h>
+#include <uv.h>
 
 #include "nbind/nbind.h"
 #include "libmtp.h"
+
+using v8::Isolate;
+using v8::HandleScope;
+
 
 #ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
@@ -190,8 +191,8 @@ public:
 
     LIBMTP_mtpdevice_t *m_device;
 
-    std::vector <devicestorage_t> getStorages() {
-        std::vector <devicestorage_t> result;
+    std::vector<devicestorage_t> getStorages() {
+        std::vector<devicestorage_t> result;
         for (LIBMTP_devicestorage_t *storage = m_device->storage; storage != nullptr; storage = storage->next) {
             result.push_back(devicestorage_t(storage));
         }
@@ -302,7 +303,7 @@ uint16_t MTPDataGet(void *params, void *priv,
     *gotlen = 0;
 
     while (true) {
-        std::unique_lock <std::mutex> lk(shared_buf->mx);
+        std::unique_lock<std::mutex> lk(shared_buf->mx);
         shared_buf->cv_put.wait(lk, [shared_buf] { return shared_buf->done || shared_buf->size; });
 
         if (shared_buf->size) {
@@ -336,14 +337,14 @@ uint16_t MTPDataPut(void *params, void *priv,
     SharedBuffer *shared_buf = (SharedBuffer *) priv;
 
     {
-        std::lock_guard <std::mutex> lk(shared_buf->mx);
+        std::lock_guard<std::mutex> lk(shared_buf->mx);
         shared_buf->data = data;
         shared_buf->size = sendlen;
     }
 
     shared_buf->cv_put.notify_one();
 
-    std::unique_lock <std::mutex> lk(shared_buf->mx);
+    std::unique_lock<std::mutex> lk(shared_buf->mx);
     shared_buf->cv_get.wait(lk, [shared_buf] { return shared_buf->done || !shared_buf->size; });
 
     if ((shared_buf->done) && (0 != shared_buf->size)) {
@@ -363,7 +364,7 @@ int Send_File_From_Device(mtpdevice_t device, mtpdevice_t fromDevice, uint32_t c
     std::future<int> resultGet = std::async([dev, shared_buf, id] {
         int result = LIBMTP_Get_File_To_Handler(dev, id, MTPDataPut, shared_buf, nullptr, nullptr);
         {
-            std::lock_guard <std::mutex> lk(shared_buf->mx);
+            std::lock_guard<std::mutex> lk(shared_buf->mx);
             shared_buf->done = true;
         }
         shared_buf->cv_put.notify_all();
@@ -373,7 +374,7 @@ int Send_File_From_Device(mtpdevice_t device, mtpdevice_t fromDevice, uint32_t c
     int resultSend = LIBMTP_Send_File_From_Handler(device.m_device, MTPDataGet, shared_buf, filedata.get(),
                                                    FileProgressCallback, (const void *) &progressCB);
     {
-        std::lock_guard <std::mutex> lk(shared_buf->mx);
+        std::lock_guard<std::mutex> lk(shared_buf->mx);
         shared_buf->done = true;
     }
     shared_buf->cv_get.notify_all();
@@ -393,8 +394,8 @@ int Send_File_From_Device(mtpdevice_t device, mtpdevice_t fromDevice, uint32_t c
     return result;
 }
 
-std::vector <file_t> Get_Files_And_Folders(mtpdevice_t device, uint32_t const storage, uint32_t const parent) {
-    std::vector <file_t> result;
+std::vector<file_t> Get_Files_And_Folders(mtpdevice_t device, uint32_t const storage, uint32_t const parent) {
+    std::vector<file_t> result;
     LIBMTP_file_t *next = nullptr;
 
     for (LIBMTP_file_t *file = LIBMTP_Get_Files_And_Folders(device.m_device, storage, parent);
@@ -463,7 +464,7 @@ mtpdevice_t Open_Raw_Device(raw_device_t rawDevice) {
 
 uint32_t lookup_folder_id(LIBMTP_folder_t *folder, char *path, char *parent) {
     char *current;
-    uint32_t ret = (uint32_t) - 1;
+    uint32_t ret = (uint32_t) -1;
 
     if (strcmp(path, "/") == 0) {
         return 0;
@@ -484,7 +485,7 @@ uint32_t lookup_folder_id(LIBMTP_folder_t *folder, char *path, char *parent) {
         ret = lookup_folder_id(folder->child, path, current);
     }
     free(current);
-    if (ret != (uint32_t)(-1)) {
+    if (ret != (uint32_t) (-1)) {
         return ret;
     }
 
@@ -518,7 +519,7 @@ int parse_path(char *path, LIBMTP_file_t *files, LIBMTP_folder_t *folders) {
     // Check if path is a folder
     item_id = lookup_folder_id(folders, path, const_cast<char *>(""));
 
-    if (item_id == (uint32_t) - 1) {
+    if (item_id == (uint32_t) -1) {
         char *dirc = strdup(path);
         char *basec = strdup(path);
         char *parent = dirname(dirc);
@@ -556,22 +557,64 @@ int pathToId(const std::string path, file_t fileData, folder_t folderData) {
     return _return;
 }
 
-void Detect_Raw_Devices(nbind::cbFunction &cb) {
-    LIBMTP_raw_device_t *rawdevices = nullptr;
+struct WorkerDetectRawDevices {
+    WorkerDetectRawDevices(nbind::cbFunction cb) : callback(cb) {}
+
+    uv_work_t worker;
+    nbind::cbFunction callback;
+
+    bool error;
+    std::string errorMsg;
+
+    std::vector<raw_device_t> result;
     int numrawdevices = 0;
+    LIBMTP_error_number_t err;
 
-    LIBMTP_error_number_t err = LIBMTP_Detect_Raw_Devices(&rawdevices, &numrawdevices);
-    std::vector <raw_device_t> result;
+};
 
-    if (nullptr != rawdevices) {
-        for (int i = 0; i < numrawdevices; i++) {
-            result.push_back(rawdevices[i]);
-        }
-        free(rawdevices);
-    }
+void DetectRawDevicesDone(uv_work_t *order, int status) {
+    Isolate *isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
 
-    cb((int) err, result);
+    WorkerDetectRawDevices *work = static_cast< WorkerDetectRawDevices * >( order->data );
+
+    work->callback.call<void>((int) work->err, work->result, work->errorMsg);
+
+    // Memory cleanup
+    work->callback.reset();
+    delete work;
 }
+
+void DetectRawDevicesRunner(uv_work_t *order) {
+    WorkerDetectRawDevices *work = static_cast< WorkerDetectRawDevices * >( order->data );
+    LIBMTP_raw_device_t *rawdevices = nullptr;
+
+    try {
+        work->err = LIBMTP_Detect_Raw_Devices(&rawdevices, &work->numrawdevices);
+
+
+        if (nullptr != rawdevices) {
+            for (int i = 0; i < work->numrawdevices; i++) {
+                work->result.push_back(rawdevices[i]);
+            }
+            free(rawdevices);
+        }
+    }
+    catch (...) {
+        work->error = true;
+        work->errorMsg = "Error occured while detecting raw devices";
+    }
+}
+
+void DetectRawDevices(nbind::cbFunction &callback) {
+    WorkerDetectRawDevices *work = new WorkerDetectRawDevices(callback);
+
+    work->worker.data = work;
+    work->error = false;
+
+    uv_queue_work(uv_default_loop(), &work->worker, DetectRawDevicesRunner, DetectRawDevicesDone);
+}
+
 
 void Init() {
     LIBMTP_Init();
@@ -631,7 +674,7 @@ NBIND_CLASS(databuffer_t){
 
 NBIND_GLOBAL() {
     function(Init);
-    function(Detect_Raw_Devices);
+    function(DetectRawDevices);
     function(Open_Raw_Device);
     function(Open_Raw_Device_Uncached);
     function(Release_Device);

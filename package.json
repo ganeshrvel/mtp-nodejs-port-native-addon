@@ -5,12 +5,11 @@
   "description": "MTP Kernel for Node.js - Native addon",
   "main": "lib/index.js",
   "scripts": {
-    "build-node-gyp": "npm run autogypi && npm run node-gyp configure build",
-    "dev": "node --inspect run.js",
-    "install": "npm run build-node-gyp",
-    "autogypi": "autogypi",
-    "node-gyp": "node-gyp",
-    "test": "node test.js"
+    "run": "yarn build-dev && yarn start",
+    "build-dev": "autogypi && node-gyp rebuild --debug configure",
+    "build": "node-gyp rebuild",
+    "start": "node --inspect ./test.js",
+    "clean": "node-gyp clean"
   },
   "keywords": [
     "mtp",
