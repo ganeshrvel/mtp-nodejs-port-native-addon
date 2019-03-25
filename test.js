@@ -58,7 +58,6 @@ async function run(resetmtp = false, searchDir = null) {
     console.log(`setStorageDevicesData`);
     console.error(setStorageDevicesData);
     console.log(`========================`);
-    return;
   }
 
   /* if (resetmtp) {
@@ -103,27 +102,25 @@ async function run(resetmtp = false, searchDir = null) {
   console.log(resolvePathData);*/
 
 
-  return;
-
   /**
    * =====================================================================
    * List MTP File Tree
    */
 
-  const {
-    error: listMtpFileTreeError,
-    data: listMtpFileTreeData
-  } = await mtpObj.listMtpFileTree({
-    recursive: true,
-    folderPath: '/ABCD'
-  });
+  /*  const {
+      error: listMtpFileTreeError,
+      data: listMtpFileTreeData
+    } = await mtpObj.listMtpFileTree({
+      recursive: true,
+      folderPath: '/ABCD'
+    });
 
-  if (listMtpFileTreeError) {
-    console.error(listMtpFileTreeError);
-    return;
-  }
+    if (listMtpFileTreeError) {
+      console.error(listMtpFileTreeError);
+      return;
+    }
 
-  console.log(listMtpFileTreeData);
+    console.log(listMtpFileTreeData);*/
   /**
    * =====================================================================
    * List Local File Tree
@@ -311,7 +308,16 @@ async function run(resetmtp = false, searchDir = null) {
   } = await mtpObj.releaseDevice();
 
   if (releaseDeviceError) {
+    console.log(`========================`);
+    console.log(`releaseDeviceError`);
     console.error(releaseDeviceError);
+    console.log(`========================`);
+  }
+  if (releaseDeviceData) {
+    console.log(`========================`);
+    console.log(`releaseDeviceData`);
+    console.error(releaseDeviceData);
+    console.log(`========================`);
   }
 }
 

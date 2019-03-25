@@ -449,9 +449,6 @@ std::string Get_Deviceversion(MtpDeviceT device) {
     return result;
 }
 
-void Release_Device(MtpDeviceT device) {
-    LIBMTP_Release_Device(device.m_device);
-}
 
 MtpDeviceT Open_Raw_Device(RawDeviceT rawDevice) {
     return MtpDeviceT(LIBMTP_Open_Raw_Device(rawDevice.get()));
@@ -738,6 +735,64 @@ void GetStorage(MtpDeviceT device, const int sortby, nbind::cbFunction &callback
 }
 
 
+/*
+ * WorkerReleaseDevice
+ */
+
+class WorkerReleaseDevice {
+public:
+    WorkerReleaseDevice(MtpDeviceT device, nbind::cbFunction cb) :
+            callback(cb), device(device) {}
+
+    uv_work_t worker;
+    nbind::cbFunction callback;
+
+    bool error;
+    std::string errorMsg;
+
+    MtpDeviceT device;
+};
+
+void ReleaseDeviceDone(uv_work_t *order, int status) {
+    Isolate *isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
+
+    WorkerReleaseDevice *work = static_cast< WorkerReleaseDevice * >( order->data );
+
+    if (work->error) {
+        work->callback.call<void>(work->errorMsg.c_str());
+    } else {
+        work->callback.call<void>(NULL);
+    }
+
+    // Memory cleanup
+    work->callback.reset();
+    delete work;
+}
+
+void ReleaseDeviceRunner(uv_work_t *order) {
+    WorkerReleaseDevice *work = static_cast< WorkerReleaseDevice * >( order->data );
+
+    try {
+        LIBMTP_Release_Device(work->device.m_device);
+    }
+    catch (...) {
+        work->error = true;
+        work->errorMsg = "Error occured while releasing the MTP device";
+    }
+}
+
+void ReleaseDevice(MtpDeviceT device, nbind::cbFunction &callback) {
+    WorkerReleaseDevice *work = new WorkerReleaseDevice(device, callback);
+
+    work->worker.data = work;
+    work->device = device;
+    work->error = false;
+
+    uv_queue_work(uv_default_loop(), &work->worker, ReleaseDeviceRunner, ReleaseDeviceDone);
+}
+
+
 void Init() {
     LIBMTP_Init();
 }
@@ -799,7 +854,7 @@ NBIND_GLOBAL() {
     function(DetectRawDevices);
     function(OpenRawDeviceUncached);
     function(Open_Raw_Device);
-    function(Release_Device);
+    function(ReleaseDevice);
     function(Get_Friendlyname);
     function(Get_Modelname);
     function(Get_Serialnumber);
