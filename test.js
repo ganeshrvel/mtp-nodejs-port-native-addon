@@ -21,11 +21,13 @@ async function run(resetmtp = false, searchDir = null) {
   } = await mtpObj.detectMtp();
 
   if (detectMtpError) {
+    console.log(`detectMtpError ====>`);
     console.error(detectMtpError);
     return;
   }
 
   if (detectMtpData) {
+    console.log(`detectMtpData ====>`);
     console.log(detectMtpData);
   }
 
@@ -40,11 +42,13 @@ async function run(resetmtp = false, searchDir = null) {
   } = await mtpObj.setStorageDevices({ storageIndex: 0 });
 
   if (setStorageDevicesError) {
+    console.log(`setStorageDevicesError ====>`);
     console.error(setStorageDevicesError);
     return;
   }
 
   if (setStorageDevicesData) {
+    console.log(`setStorageDevicesData ====>`);
     console.error(setStorageDevicesData);
     return;
   }

@@ -69,7 +69,6 @@ public:
 
     LIBMTP_raw_device_t *get() { return &m_rawDevice; }
 
-    LIBMTP_raw_device_t rawDevice;
 
 private:
     LIBMTP_raw_device_t m_rawDevice;
@@ -627,13 +626,14 @@ MtpDeviceT Open_Raw_Device_Uncached(RawDeviceT rawDevice) {
 
 class WorkerOpenRawDeviceUncached {
 public:
-    WorkerOpenRawDeviceUncached(nbind::cbFunction cb) : callback(cb) {}
+    WorkerOpenRawDeviceUncached(RawDeviceT rawDevice, nbind::cbFunction cb) : callback(cb), rawDevice(rawDevice) {}
 
     uv_work_t worker;
     nbind::cbFunction callback;
 
     bool error;
     std::string errorMsg;
+
     RawDeviceT rawDevice;
     MtpDeviceT mtpDevice;
 };
@@ -659,7 +659,7 @@ void OpenRawDeviceUncachedRunner(uv_work_t *order) {
     WorkerOpenRawDeviceUncached *work = static_cast< WorkerOpenRawDeviceUncached * >( order->data );
 
     try {
-        //work->mtpDevice = MtpDeviceT(LIBMTP_Open_Raw_Device_Uncached(work->rawDevice.get()));
+        work->mtpDevice = MtpDeviceT(LIBMTP_Open_Raw_Device_Uncached(work->rawDevice.get()));
     }
     catch (...) {
         work->error = true;
@@ -668,10 +668,10 @@ void OpenRawDeviceUncachedRunner(uv_work_t *order) {
 }
 
 void OpenRawDeviceUncached(RawDeviceT rawDevice, nbind::cbFunction &callback) {
-    WorkerOpenRawDeviceUncached *work = new WorkerOpenRawDeviceUncached(callback);
+    WorkerOpenRawDeviceUncached *work = new WorkerOpenRawDeviceUncached(rawDevice, callback);
 
     work->worker.data = work;
-    //work->rawDevice = rawDevice;
+    work->rawDevice = rawDevice;
     work->error = false;
 
     uv_queue_work(uv_default_loop(), &work->worker, OpenRawDeviceUncachedRunner, OpenRawDeviceUncachedDone);
