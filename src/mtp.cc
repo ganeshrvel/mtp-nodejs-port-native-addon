@@ -21,9 +21,9 @@ using v8::HandleScope;
 
 class DataBufferT {
 public:
-    DataBufferT(unsigned char *data, uint32_t size, uint32_t len) : m_data(data), m_size(size), m_length(len) {}
+    DataBufferT(unsigned char *data, uint32_t size, uint32_t len) : m_data(data), m_length(len), m_size(size) {}
 
-    DataBufferT(const DataBufferT &db) : m_data(db.m_data), m_size(db.m_size), m_length(db.m_length) {}
+    DataBufferT(const DataBufferT &db) : m_data(db.m_data), m_length(db.m_length), m_size(db.m_size) {}
 
     uint32_t getLength() { return m_length; }
 
@@ -421,10 +421,6 @@ FileT Get_Filemetadata(MtpDeviceT device, uint32_t const id) {
     return result;
 }
 
-int Get_Storage(MtpDeviceT device, const int sortby) {
-    return LIBMTP_Get_Storage(device.m_device, sortby);
-}
-
 std::string Get_Friendlyname(MtpDeviceT device) {
     char *fn = LIBMTP_Get_Friendlyname(device.m_device);
     std::string result(fn);
@@ -556,6 +552,10 @@ int pathToId(const std::string path, FileT fileData, FolderT folderData) {
     return _return;
 }
 
+/*
+ * WorkerDetectRawDevices
+ */
+
 class WorkerDetectRawDevices {
 public:
     WorkerDetectRawDevices(nbind::cbFunction cb) : callback(cb) {}
@@ -619,6 +619,10 @@ void DetectRawDevices(nbind::cbFunction &callback) {
     uv_queue_work(uv_default_loop(), &work->worker, DetectRawDevicesRunner, DetectRawDevicesDone);
 }
 
+/*
+ * WorkerOpenRawDeviceUncached
+ */
+
 class WorkerOpenRawDeviceUncached {
 public:
     WorkerOpenRawDeviceUncached(RawDeviceT rawDevice, nbind::cbFunction cb) : callback(cb), rawDevice(rawDevice) {}
@@ -670,6 +674,67 @@ void OpenRawDeviceUncached(RawDeviceT rawDevice, nbind::cbFunction &callback) {
     work->error = false;
 
     uv_queue_work(uv_default_loop(), &work->worker, OpenRawDeviceUncachedRunner, OpenRawDeviceUncachedDone);
+}
+
+/*
+ * WorkerGetStorage
+ */
+
+class WorkerGetStorage {
+public:
+    WorkerGetStorage(MtpDeviceT device, int sortby, nbind::cbFunction cb) :
+            callback(cb), device(device), sortby(sortby) {}
+
+    uv_work_t worker;
+    nbind::cbFunction callback;
+
+    bool error;
+    std::string errorMsg;
+
+    MtpDeviceT device;
+    int sortby;
+
+    int output;
+};
+
+void GetStorageDone(uv_work_t *order, int status) {
+    Isolate *isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
+
+    WorkerGetStorage *work = static_cast< WorkerGetStorage * >( order->data );
+
+    if (work->error) {
+        work->callback.call<void>(work->errorMsg.c_str(), work->output);
+    } else {
+        work->callback.call<void>(NULL, work->output);
+    }
+
+    // Memory cleanup
+    work->callback.reset();
+    delete work;
+}
+
+void GetStorageRunner(uv_work_t *order) {
+    WorkerGetStorage *work = static_cast< WorkerGetStorage * >( order->data );
+
+    try {
+        work->output = LIBMTP_Get_Storage(work->device.m_device, work->sortby);
+    }
+    catch (...) {
+        work->error = true;
+        work->errorMsg = "Error occured while accessing the MTP storage";
+    }
+}
+
+void GetStorage(MtpDeviceT device, const int sortby, nbind::cbFunction &callback) {
+    WorkerGetStorage *work = new WorkerGetStorage(device, sortby, callback);
+
+    work->worker.data = work;
+    work->device = device;
+    work->sortby = sortby;
+    work->error = false;
+
+    uv_queue_work(uv_default_loop(), &work->worker, GetStorageRunner, GetStorageDone);
 }
 
 
@@ -739,7 +804,7 @@ NBIND_GLOBAL() {
     function(Get_Modelname);
     function(Get_Serialnumber);
     function(Get_Deviceversion);
-    function(Get_Storage);
+    function(GetStorage);
     function(Get_Files_And_Folders);
     function(Get_File_To_File);
     function(Get_File_To_File_Descriptor);

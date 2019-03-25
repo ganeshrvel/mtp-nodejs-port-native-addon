@@ -21,14 +21,18 @@ async function run(resetmtp = false, searchDir = null) {
   } = await mtpObj.detectMtp();
 
   if (detectMtpError) {
-    console.log(`detectMtpError ====>`);
+    console.log(`========================`);
+    console.log(`detectMtpError`);
     console.error(detectMtpError);
+    console.log(`========================`);
     return;
   }
 
   if (detectMtpData) {
-    console.log(`detectMtpData ====>`);
+    console.log(`========================`);
+    console.log(`detectMtpData`);
     console.log(detectMtpData);
+    console.log(`========================`);
   }
 
 
@@ -42,19 +46,20 @@ async function run(resetmtp = false, searchDir = null) {
   } = await mtpObj.setStorageDevices({ storageIndex: 0 });
 
   if (setStorageDevicesError) {
-    console.log(`setStorageDevicesError ====>`);
+    console.log(`========================`);
+    console.log(`setStorageDevicesError`);
     console.error(setStorageDevicesError);
+    console.log(`========================`);
     return;
   }
 
   if (setStorageDevicesData) {
-    console.log(`setStorageDevicesData ====>`);
+    console.log(`========================`);
+    console.log(`setStorageDevicesData`);
     console.error(setStorageDevicesData);
+    console.log(`========================`);
     return;
   }
-
-
-  return;
 
   /* if (resetmtp) {
     const {
@@ -96,6 +101,9 @@ async function run(resetmtp = false, searchDir = null) {
     return;
   }
   console.log(resolvePathData);*/
+
+
+  return;
 
   /**
    * =====================================================================
