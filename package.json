@@ -8,7 +8,7 @@
     "run": "yarn build-dev && yarn start",
     "build-dev": "autogypi && node-gyp rebuild --debug configure",
     "build": "node-gyp rebuild",
-    "start": "node --inspect ./test.js",
+    "start": "node ./test.js",
     "clean": "node-gyp clean"
   },
   "keywords": [

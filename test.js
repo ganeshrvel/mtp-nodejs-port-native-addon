@@ -25,6 +25,10 @@ async function run(resetmtp = false, searchDir = null) {
     return;
   }
 
+  if (detectMtpData) {
+    console.log(detectMtpData);
+  }
+
 
   /**
    * =====================================================================
@@ -37,6 +41,11 @@ async function run(resetmtp = false, searchDir = null) {
 
   if (setStorageDevicesError) {
     console.error(setStorageDevicesError);
+    return;
+  }
+
+  if (setStorageDevicesData) {
+    console.error(setStorageDevicesData);
     return;
   }
 

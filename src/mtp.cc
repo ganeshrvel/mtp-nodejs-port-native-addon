@@ -19,11 +19,11 @@ using v8::HandleScope;
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
-class databuffer_t {
+class DataBufferT {
 public:
-    databuffer_t(unsigned char *data, uint32_t size, uint32_t len) : m_data(data), m_size(size), m_length(len) {}
+    DataBufferT(unsigned char *data, uint32_t size, uint32_t len) : m_data(data), m_size(size), m_length(len) {}
 
-    databuffer_t(const databuffer_t &db) : m_data(db.m_data), m_size(db.m_size), m_length(db.m_length) {}
+    DataBufferT(const DataBufferT &db) : m_data(db.m_data), m_size(db.m_size), m_length(db.m_length) {}
 
     uint32_t getLength() { return m_length; }
 
@@ -44,11 +44,12 @@ private:
     uint32_t m_size;
 };
 
-class raw_device_t {
+class RawDeviceT {
 public:
-    raw_device_t(LIBMTP_raw_device_t rawDevice) : m_rawDevice(rawDevice) {}
 
-    raw_device_t(const raw_device_t &rawDevice) : m_rawDevice(rawDevice.m_rawDevice) {}
+    RawDeviceT(LIBMTP_raw_device_t rawDevice) : m_rawDevice(rawDevice) {}
+
+    RawDeviceT(const RawDeviceT &rawDevice) : m_rawDevice(rawDevice.m_rawDevice) {}
 
     uint32_t getBusLocation() { return m_rawDevice.bus_location; }
 
@@ -59,7 +60,7 @@ public:
     void setDevNum(const uint8_t devNum) { m_rawDevice.devnum = devNum; }
 
     char *getVendor() {
-        if (NULL == m_rawDevice.device_entry.vendor) {
+        if (m_rawDevice.device_entry.vendor == nullptr) {
             return "";
         }
 
@@ -68,13 +69,16 @@ public:
 
     LIBMTP_raw_device_t *get() { return &m_rawDevice; }
 
+    LIBMTP_raw_device_t rawDevice;
+
 private:
     LIBMTP_raw_device_t m_rawDevice;
 };
 
-class file_t {
+
+class FileT {
 public:
-    file_t(LIBMTP_file_t *file = nullptr) : m_name(file ? file->filename : "") {
+    FileT(LIBMTP_file_t *file = nullptr) : m_name(file ? file->filename : "") {
         if (file) {
             memcpy(&m_file, file, sizeof(m_file));
         } else {
@@ -83,7 +87,7 @@ public:
         m_file.filename = (char *) m_name.c_str();
     }
 
-    file_t(const file_t &file) : m_file(file.m_file), m_name(file.m_name) {
+    FileT(const FileT &file) : m_file(file.m_file), m_name(file.m_name) {
         m_file.filename = (char *) m_name.c_str();
     }
 
@@ -120,9 +124,9 @@ private:
     std::string m_name;
 };
 
-class folder_t {
+class FolderT {
 public:
-    folder_t(LIBMTP_folder_t *folder = nullptr) : m_name(folder ? folder->name : "") {
+    FolderT(LIBMTP_folder_t *folder = nullptr) : m_name(folder ? folder->name : "") {
         if (folder) {
             memcpy(&m_folder, folder, sizeof(m_folder));
         } else {
@@ -131,7 +135,7 @@ public:
         m_folder.name = (char *) m_name.c_str();
     }
 
-    folder_t(const folder_t &folder) : m_folder(folder.m_folder), m_name(folder.m_name) {
+    FolderT(const FolderT &folder) : m_folder(folder.m_folder), m_name(folder.m_name) {
         m_folder.name = (char *) m_name.c_str();
     }
 
@@ -162,13 +166,13 @@ private:
     std::string m_name;
 };
 
-class devicestorage_t {
+class DeviceStorageT {
 public:
-    devicestorage_t(LIBMTP_devicestorage_t *storage = nullptr) : m_storage(*storage),
-                                                                 m_description(storage->StorageDescription) {}
+    DeviceStorageT(LIBMTP_devicestorage_t *storage = nullptr) : m_storage(*storage),
+                                                                m_description(storage->StorageDescription) {}
 
-    devicestorage_t(const devicestorage_t &storage) : m_storage(storage.m_storage),
-                                                      m_description(storage.m_description) {};
+    DeviceStorageT(const DeviceStorageT &storage) : m_storage(storage.m_storage),
+                                                    m_description(storage.m_description) {};
 
     uint32_t getId() { return m_storage.id; }
 
@@ -183,18 +187,18 @@ private:
     std::string m_description;
 };
 
-class mtpdevice_t {
+class MtpDeviceT {
 public:
-    mtpdevice_t(LIBMTP_mtpdevice_t *device = nullptr) : m_device(device) {}
+    MtpDeviceT(LIBMTP_mtpdevice_t *device = nullptr) : m_device(device) {}
 
-    mtpdevice_t(const mtpdevice_t &device) : m_device(device.m_device) {}
+    MtpDeviceT(const MtpDeviceT &device) : m_device(device.m_device) {}
 
     LIBMTP_mtpdevice_t *m_device;
 
-    std::vector<devicestorage_t> getStorages() {
-        std::vector<devicestorage_t> result;
+    std::vector<DeviceStorageT> getStorages() {
+        std::vector<DeviceStorageT> result;
         for (LIBMTP_devicestorage_t *storage = m_device->storage; storage != nullptr; storage = storage->next) {
-            result.push_back(devicestorage_t(storage));
+            result.push_back(DeviceStorageT(storage));
         }
         return result;
     }
@@ -208,7 +212,7 @@ int FileProgressCallback(uint64_t const sent, uint64_t const total, void const *
 
 uint16_t MTPDataPutCallback(void *params, void *priv, uint32_t sendlen, unsigned char *data, uint32_t *putlen) {
     nbind::cbFunction cb = *((nbind::cbFunction *) priv);
-    databuffer_t buf(data, sendlen, sendlen);
+    DataBufferT buf(data, sendlen, sendlen);
 
     if (false == cb.call<bool>(buf)) {
         return LIBMTP_HANDLER_RETURN_ERROR;
@@ -221,7 +225,7 @@ uint16_t MTPDataPutCallback(void *params, void *priv, uint32_t sendlen, unsigned
 
 uint16_t MTPDataGetCallback(void *params, void *priv, uint32_t wantlen, unsigned char *data, uint32_t *gotlen) {
     nbind::cbFunction cb = *((nbind::cbFunction *) priv);
-    databuffer_t buf(data, wantlen, 0);
+    DataBufferT buf(data, wantlen, 0);
 
     if (false == cb.call<bool>(buf)) {
         return LIBMTP_HANDLER_RETURN_ERROR;
@@ -232,45 +236,45 @@ uint16_t MTPDataGetCallback(void *params, void *priv, uint32_t wantlen, unsigned
     return LIBMTP_HANDLER_RETURN_OK;
 }
 
-int Get_File_To_File(mtpdevice_t device, uint32_t const id, const std::string path, nbind::cbFunction &cb) {
+int Get_File_To_File(MtpDeviceT device, uint32_t const id, const std::string path, nbind::cbFunction &cb) {
     return LIBMTP_Get_File_To_File(device.m_device, id, path.c_str(), FileProgressCallback, (const void *) &cb);
 }
 
-int Get_File_To_File_Descriptor(mtpdevice_t device, uint32_t const id, int const fd, nbind::cbFunction &cb) {
+int Get_File_To_File_Descriptor(MtpDeviceT device, uint32_t const id, int const fd, nbind::cbFunction &cb) {
     return LIBMTP_Get_File_To_File_Descriptor(device.m_device, id, fd, FileProgressCallback, (const void *) &cb);
 }
 
-int Get_File_To_Handler(mtpdevice_t device, uint32_t const id, nbind::cbFunction &dataPutCB,
+int Get_File_To_Handler(MtpDeviceT device, uint32_t const id, nbind::cbFunction &dataPutCB,
                         nbind::cbFunction &progressCB) {
     return LIBMTP_Get_File_To_Handler(device.m_device, id, MTPDataPutCallback, (void *) &dataPutCB,
                                       FileProgressCallback, (const void *) &progressCB);
 }
 
-int Send_File_From_File(mtpdevice_t device, const std::string path, file_t filedata, nbind::cbFunction &cb) {
+int Send_File_From_File(MtpDeviceT device, const std::string path, FileT filedata, nbind::cbFunction &cb) {
     return LIBMTP_Send_File_From_File(device.m_device, path.c_str(), filedata.get(), FileProgressCallback,
                                       (const void *) &cb);
 }
 
-int Send_File_From_File_Descriptor(mtpdevice_t device, const int fd, file_t filedata, nbind::cbFunction &cb) {
+int Send_File_From_File_Descriptor(MtpDeviceT device, const int fd, FileT filedata, nbind::cbFunction &cb) {
     return LIBMTP_Send_File_From_File_Descriptor(device.m_device, fd, filedata.get(), FileProgressCallback,
                                                  (const void *) &cb);
 }
 
-int Send_File_From_Handler(mtpdevice_t device, nbind::cbFunction &dataGetCB, file_t filedata,
+int Send_File_From_Handler(MtpDeviceT device, nbind::cbFunction &dataGetCB, FileT filedata,
                            nbind::cbFunction &progressCB) {
     return LIBMTP_Send_File_From_Handler(device.m_device, MTPDataGetCallback, (void *) &dataGetCB, filedata.get(),
                                          FileProgressCallback, (const void *) &progressCB);
 }
 
-int Set_File_Name(mtpdevice_t device, file_t file, const std::string path) {
+int Set_File_Name(MtpDeviceT device, FileT file, const std::string path) {
     return LIBMTP_Set_File_Name(device.m_device, file.get(), path.c_str());
 }
 
-void Destroy_file(mtpdevice_t device, uint32_t const id) {
+void Destroy_file(MtpDeviceT device, uint32_t const id) {
     LIBMTP_Delete_Object(device.m_device, id);
 }
 
-int Create_Folder(mtpdevice_t device,
+int Create_Folder(MtpDeviceT device,
                   const std::string fileName,
                   int const parentId,
                   int const storageId) {
@@ -356,7 +360,7 @@ uint16_t MTPDataPut(void *params, void *priv,
     return LIBMTP_HANDLER_RETURN_OK;
 }
 
-int Send_File_From_Device(mtpdevice_t device, mtpdevice_t fromDevice, uint32_t const id, file_t filedata,
+int Send_File_From_Device(MtpDeviceT device, MtpDeviceT fromDevice, uint32_t const id, FileT filedata,
                           nbind::cbFunction &progressCB) {
     SharedBuffer *shared_buf = new SharedBuffer();
 
@@ -394,8 +398,8 @@ int Send_File_From_Device(mtpdevice_t device, mtpdevice_t fromDevice, uint32_t c
     return result;
 }
 
-std::vector<file_t> Get_Files_And_Folders(mtpdevice_t device, uint32_t const storage, uint32_t const parent) {
-    std::vector<file_t> result;
+std::vector<FileT> Get_Files_And_Folders(MtpDeviceT device, uint32_t const storage, uint32_t const parent) {
+    std::vector<FileT> result;
     LIBMTP_file_t *next = nullptr;
 
     for (LIBMTP_file_t *file = LIBMTP_Get_Files_And_Folders(device.m_device, storage, parent);
@@ -408,58 +412,54 @@ std::vector<file_t> Get_Files_And_Folders(mtpdevice_t device, uint32_t const sto
     return result;
 }
 
-file_t Get_Filemetadata(mtpdevice_t device, uint32_t const id) {
+FileT Get_Filemetadata(MtpDeviceT device, uint32_t const id) {
     LIBMTP_file_t *file = LIBMTP_Get_Filemetadata(device.m_device, id);
 
-    file_t result(file);
+    FileT result(file);
 
     LIBMTP_destroy_file_t(file);
 
     return result;
 }
 
-int Get_Storage(mtpdevice_t device, const int sortby) {
+int Get_Storage(MtpDeviceT device, const int sortby) {
     return LIBMTP_Get_Storage(device.m_device, sortby);
 }
 
-std::string Get_Friendlyname(mtpdevice_t device) {
+std::string Get_Friendlyname(MtpDeviceT device) {
     char *fn = LIBMTP_Get_Friendlyname(device.m_device);
     std::string result(fn);
     free(fn);
     return result;
 }
 
-std::string Get_Modelname(mtpdevice_t device) {
+std::string Get_Modelname(MtpDeviceT device) {
     char *fn = LIBMTP_Get_Modelname(device.m_device);
     std::string result(fn);
     free(fn);
     return result;
 }
 
-std::string Get_Serialnumber(mtpdevice_t device) {
+std::string Get_Serialnumber(MtpDeviceT device) {
     char *fn = LIBMTP_Get_Serialnumber(device.m_device);
     std::string result(fn);
     free(fn);
     return result;
 }
 
-std::string Get_Deviceversion(mtpdevice_t device) {
+std::string Get_Deviceversion(MtpDeviceT device) {
     char *fn = LIBMTP_Get_Deviceversion(device.m_device);
     std::string result(fn);
     free(fn);
     return result;
 }
 
-void Release_Device(mtpdevice_t device) {
+void Release_Device(MtpDeviceT device) {
     LIBMTP_Release_Device(device.m_device);
 }
 
-mtpdevice_t Open_Raw_Device_Uncached(raw_device_t rawDevice) {
-    return mtpdevice_t(LIBMTP_Open_Raw_Device_Uncached(rawDevice.get()));
-}
-
-mtpdevice_t Open_Raw_Device(raw_device_t rawDevice) {
-    return mtpdevice_t(LIBMTP_Open_Raw_Device(rawDevice.get()));
+MtpDeviceT Open_Raw_Device(RawDeviceT rawDevice) {
+    return MtpDeviceT(LIBMTP_Open_Raw_Device(rawDevice.get()));
 }
 
 uint32_t lookup_folder_id(LIBMTP_folder_t *folder, char *path, char *parent) {
@@ -548,7 +548,7 @@ int parse_path(char *path, LIBMTP_file_t *files, LIBMTP_folder_t *folders) {
     return -1;
 }
 
-int pathToId(const std::string path, file_t fileData, folder_t folderData) {
+int pathToId(const std::string path, FileT fileData, FolderT folderData) {
     char *cPath = strdup(path.c_str());
     int _return = parse_path(cPath, fileData.get(), folderData.get());
 
@@ -557,7 +557,8 @@ int pathToId(const std::string path, file_t fileData, folder_t folderData) {
     return _return;
 }
 
-struct WorkerDetectRawDevices {
+class WorkerDetectRawDevices {
+public:
     WorkerDetectRawDevices(nbind::cbFunction cb) : callback(cb) {}
 
     uv_work_t worker;
@@ -566,7 +567,7 @@ struct WorkerDetectRawDevices {
     bool error;
     std::string errorMsg;
 
-    std::vector<raw_device_t> result;
+    std::vector<RawDeviceT> result;
     int numrawdevices = 0;
     LIBMTP_error_number_t err;
 
@@ -578,7 +579,11 @@ void DetectRawDevicesDone(uv_work_t *order, int status) {
 
     WorkerDetectRawDevices *work = static_cast< WorkerDetectRawDevices * >( order->data );
 
-    work->callback.call<void>((int) work->err, work->result, work->errorMsg);
+    if (work->error) {
+        work->callback.call<void>(work->errorMsg.c_str(), (int) work->err, work->result);
+    } else {
+        work->callback.call<void>(NULL, (int) work->err, work->result);
+    }
 
     // Memory cleanup
     work->callback.reset();
@@ -616,13 +621,70 @@ void DetectRawDevices(nbind::cbFunction &callback) {
 }
 
 
+MtpDeviceT Open_Raw_Device_Uncached(RawDeviceT rawDevice) {
+    return MtpDeviceT(LIBMTP_Open_Raw_Device_Uncached(rawDevice.get()));
+}
+
+class WorkerOpenRawDeviceUncached {
+public:
+    WorkerOpenRawDeviceUncached(nbind::cbFunction cb) : callback(cb) {}
+
+    uv_work_t worker;
+    nbind::cbFunction callback;
+
+    bool error;
+    std::string errorMsg;
+    RawDeviceT rawDevice;
+    MtpDeviceT mtpDevice;
+};
+
+void OpenRawDeviceUncachedDone(uv_work_t *order, int status) {
+    Isolate *isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
+
+    WorkerOpenRawDeviceUncached *work = static_cast< WorkerOpenRawDeviceUncached * >( order->data );
+
+    if (work->error) {
+        work->callback.call<void>(work->errorMsg.c_str(), work->mtpDevice);
+    } else {
+        work->callback.call<void>(NULL, work->mtpDevice);
+    }
+
+    // Memory cleanup
+    work->callback.reset();
+    delete work;
+}
+
+void OpenRawDeviceUncachedRunner(uv_work_t *order) {
+    WorkerOpenRawDeviceUncached *work = static_cast< WorkerOpenRawDeviceUncached * >( order->data );
+
+    try {
+        //work->mtpDevice = MtpDeviceT(LIBMTP_Open_Raw_Device_Uncached(work->rawDevice.get()));
+    }
+    catch (...) {
+        work->error = true;
+        work->errorMsg = "Error occured while opening raw devices";
+    }
+}
+
+void OpenRawDeviceUncached(RawDeviceT rawDevice, nbind::cbFunction &callback) {
+    WorkerOpenRawDeviceUncached *work = new WorkerOpenRawDeviceUncached(callback);
+
+    work->worker.data = work;
+    //work->rawDevice = rawDevice;
+    work->error = false;
+
+    uv_queue_work(uv_default_loop(), &work->worker, OpenRawDeviceUncachedRunner, OpenRawDeviceUncachedDone);
+}
+
+
 void Init() {
     LIBMTP_Init();
 }
 
-NBIND_CLASS(file_t){
+NBIND_CLASS(FileT){
         construct<>();
-        construct<const file_t&>();
+        construct<const FileT&>();
         getset(getName, setName);
         getset(getId, setId);
         getset(getType, setType);
@@ -632,9 +694,9 @@ NBIND_CLASS(file_t){
         getter(getModificationDate);
 }
 
-NBIND_CLASS(folder_t){
+NBIND_CLASS(FolderT){
         construct<>();
-        construct<const folder_t&>();
+        construct<const FolderT&>();
         getset(getName, setName);
         getset(getId, setId);
         getset(getParentId, setParentId);
@@ -643,29 +705,29 @@ NBIND_CLASS(folder_t){
         getter(getSibling);
 }
 
-NBIND_CLASS(mtpdevice_t){
+NBIND_CLASS(MtpDeviceT){
         construct<>();
-        construct<const mtpdevice_t&>();
+        construct<const MtpDeviceT&>();
         method(getStorages);
 }
 
-NBIND_CLASS(devicestorage_t){
+NBIND_CLASS(DeviceStorageT){
         construct<>();
-        construct<const devicestorage_t&>();
+        construct<const DeviceStorageT&>();
         getset(getId, setId);
         getset(getDescription, setDescription);
 }
 
-NBIND_CLASS(raw_device_t){
+NBIND_CLASS(RawDeviceT){
         construct<LIBMTP_raw_device_t>();
-        construct<const raw_device_t&>();
+        construct<const RawDeviceT&>();
         getset(getBusLocation, setBusLocation);
         getset(getDevNum, setDevNum);
         getter(getVendor);
 }
 
-NBIND_CLASS(databuffer_t){
-        construct<const databuffer_t &>();
+NBIND_CLASS(DataBufferT){
+        construct<const DataBufferT &>();
         getter(getLength);
         getter(getSize);
         method(read);
@@ -675,6 +737,7 @@ NBIND_CLASS(databuffer_t){
 NBIND_GLOBAL() {
     function(Init);
     function(DetectRawDevices);
+    function(OpenRawDeviceUncached);
     function(Open_Raw_Device);
     function(Open_Raw_Device_Uncached);
     function(Release_Device);
