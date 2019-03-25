@@ -619,11 +619,6 @@ void DetectRawDevices(nbind::cbFunction &callback) {
     uv_queue_work(uv_default_loop(), &work->worker, DetectRawDevicesRunner, DetectRawDevicesDone);
 }
 
-
-MtpDeviceT Open_Raw_Device_Uncached(RawDeviceT rawDevice) {
-    return MtpDeviceT(LIBMTP_Open_Raw_Device_Uncached(rawDevice.get()));
-}
-
 class WorkerOpenRawDeviceUncached {
 public:
     WorkerOpenRawDeviceUncached(RawDeviceT rawDevice, nbind::cbFunction cb) : callback(cb), rawDevice(rawDevice) {}
@@ -739,7 +734,6 @@ NBIND_GLOBAL() {
     function(DetectRawDevices);
     function(OpenRawDeviceUncached);
     function(Open_Raw_Device);
-    function(Open_Raw_Device_Uncached);
     function(Release_Device);
     function(Get_Friendlyname);
     function(Get_Modelname);
