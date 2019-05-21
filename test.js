@@ -88,7 +88,7 @@ async function run(resetmtp = false, searchDir = null) {
    * Resolve Path
    */
 
-  /*const {
+  const {
     error: resolvePathError,
     data: resolvePathData
   } = await mtpObj.resolvePath({
@@ -99,7 +99,7 @@ async function run(resetmtp = false, searchDir = null) {
     console.error(resolvePathError);
     return;
   }
-  console.log(resolvePathData);*/
+  console.log(resolvePathData);
 
 
   /**
@@ -107,7 +107,7 @@ async function run(resetmtp = false, searchDir = null) {
    * List MTP File Tree (__listMtpFileTree)
    */
 
-  const {
+  /*const {
     error: listMtpFileTreeError,
     data: listMtpFileTreeData
   } = await mtpObj.__listMtpFileTree({
@@ -129,44 +129,35 @@ async function run(resetmtp = false, searchDir = null) {
     console.log(`listMtpFileTreeData`);
     console.error(listMtpFileTreeData);
     console.log(`========================`);
-  }
+  }*/
 
   /**
    * =====================================================================
    * List MTP File Tree
    */
 
-  /* const {
-     error: listMtpFileTreeError,
-     data: listMtpFileTreeData
-   } = await mtpObj.listMtpFileTree({
-     recursive: false,
-     folderPath: '/ABCD'
-   });*/
+  /*const {
+    error: listMtpFileTreeError,
+    data: listMtpFileTreeData
+  } = await mtpObj.listMtpFileTree({
+    recursive: false,
+    folderPath: '/ABCD'
+  });
 
-  /*  const {
-      error: listMtpFileTreeError,
-      data: listMtpFileTreeData
-    } = await mtpObj.__listMtpFileTree({
-      folderId: 36,
-      recursive: true,
-      parentPath: '/'
-    });
+  if (listMtpFileTreeError) {
+    console.log(`========================`);
+    console.log(`listMtpFileTreeError`);
+    console.error(listMtpFileTreeError);
+    console.log(`========================`);
+    return;
+  }
 
-    if (listMtpFileTreeError) {
-      console.log(`========================`);
-      console.log(`listMtpFileTreeError`);
-      console.error(listMtpFileTreeError);
-      console.log(`========================`);
-      return;
-    }
-
-    if (listMtpFileTreeData) {
-      console.log(`========================`);
-      console.log(`listMtpFileTreeData`);
-      console.error(listMtpFileTreeData);
-      console.log(`========================`);
-    }*/
+  if (listMtpFileTreeData) {
+    console.log(`========================`);
+    console.log(`listMtpFileTreeData`);
+    console.error(listMtpFileTreeData);
+    console.log(`========================`);
+  }*/
 
   /**
    * =====================================================================
