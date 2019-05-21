@@ -397,19 +397,6 @@ int Send_File_From_Device(MtpDeviceT device, MtpDeviceT fromDevice, uint32_t con
     return result;
 }
 
-std::vector<FileT> Get_Files_And_Folders(MtpDeviceT device, uint32_t const storage, uint32_t const parent) {
-    std::vector<FileT> result;
-    LIBMTP_file_t *next = nullptr;
-
-    for (LIBMTP_file_t *file = LIBMTP_Get_Files_And_Folders(device.m_device, storage, parent);
-         nullptr != file; file = next) {
-        result.push_back(file);
-        next = file->next;
-        LIBMTP_destroy_file_t(file);
-    }
-
-    return result;
-}
 
 FileT Get_Filemetadata(MtpDeviceT device, uint32_t const id) {
     LIBMTP_file_t *file = LIBMTP_Get_Filemetadata(device.m_device, id);
@@ -691,7 +678,6 @@ public:
 
     MtpDeviceT device;
     int sortby;
-
     int output;
 };
 
@@ -795,13 +781,29 @@ void ReleaseDevice(MtpDeviceT device, nbind::cbFunction &callback) {
 
 
 /*
- * resolvePath
+ * WorkerGetFilesAndFolders
  */
 
-class WorkerReleaseDevice {
+/*
+std::vector<FileT> GetFilesAndFolders__(MtpDeviceT device, uint32_t const storage, uint32_t const parent) {
+    std::vector<FileT> result;
+    LIBMTP_file_t *next = nullptr;
+
+    for (LIBMTP_file_t *file = LIBMTP_Get_Files_And_Folders(device.m_device, storage, parent);
+         nullptr != file; file = next) {
+        result.push_back(file);
+        next = file->next;
+        LIBMTP_destroy_file_t(file);
+    }
+
+    return result;
+}
+*/
+
+class WorkerGetFilesAndFolders {
 public:
-    WorkerReleaseDevice(MtpDeviceT device, nbind::cbFunction cb) :
-            callback(cb), device(device) {}
+    WorkerGetFilesAndFolders(MtpDeviceT device, uint32_t storage, uint32_t parent, nbind::cbFunction cb) :
+            callback(cb), device(device), storage(storage), parent(parent) {};
 
     uv_work_t worker;
     nbind::cbFunction callback;
@@ -810,18 +812,22 @@ public:
     std::string errorMsg;
 
     MtpDeviceT device;
+    uint32_t storage;
+    uint32_t parent;
+    std::vector<FileT> output;
 };
 
-void ReleaseDeviceDone(uv_work_t *order, int status) {
+
+void GetFilesAndFoldersDone(uv_work_t *order, int status) {
     Isolate *isolate = Isolate::GetCurrent();
     HandleScope handleScope(isolate);
 
-    WorkerReleaseDevice *work = static_cast< WorkerReleaseDevice * >( order->data );
+    WorkerGetFilesAndFolders *work = static_cast< WorkerGetFilesAndFolders * >( order->data );
 
     if (work->error) {
-        work->callback.call<void>(work->errorMsg.c_str());
+        work->callback.call<void>(work->errorMsg.c_str(), work->output);
     } else {
-        work->callback.call<void>(NULL);
+        work->callback.call<void>(NULL, work->output);
     }
 
     // Memory cleanup
@@ -829,27 +835,37 @@ void ReleaseDeviceDone(uv_work_t *order, int status) {
     delete work;
 }
 
-void ReleaseDeviceRunner(uv_work_t *order) {
-    WorkerReleaseDevice *work = static_cast< WorkerReleaseDevice * >( order->data );
+void GetFilesAndFoldersRunner(uv_work_t *order) {
+    WorkerGetFilesAndFolders *work = static_cast< WorkerGetFilesAndFolders * >( order->data );
+
+    LIBMTP_file_t *next = nullptr;
 
     try {
-        LIBMTP_Release_Device(work->device.m_device);
+        for (LIBMTP_file_t *file = LIBMTP_Get_Files_And_Folders(work->device.m_device, work->storage, work->parent);
+             nullptr != file; file = next) {
+            work->output.push_back(file);
+            next = file->next;
+            LIBMTP_destroy_file_t(file);
+        }
     }
     catch (...) {
         work->error = true;
-        work->errorMsg = "Error occured while releasing the MTP device";
+        work->errorMsg = "Error occured while listing the directory";
     }
 }
 
-void ReleaseDevice(MtpDeviceT device, nbind::cbFunction &callback) {
-    WorkerReleaseDevice *work = new WorkerReleaseDevice(device, callback);
+void GetFilesAndFolders(MtpDeviceT device, uint32_t const storage, uint32_t const parent, nbind::cbFunction &callback) {
+    WorkerGetFilesAndFolders *work = new WorkerGetFilesAndFolders(device, storage, parent, callback);
 
     work->worker.data = work;
     work->device = device;
+    work->storage = storage;
+    work->parent = parent;
     work->error = false;
 
-    uv_queue_work(uv_default_loop(), &work->worker, ReleaseDeviceRunner, ReleaseDeviceDone);
+    uv_queue_work(uv_default_loop(), &work->worker, GetFilesAndFoldersRunner, GetFilesAndFoldersDone);
 }
+
 
 void Init() {
     LIBMTP_Init();
@@ -909,16 +925,16 @@ NBIND_CLASS(DataBufferT){
 
 NBIND_GLOBAL() {
     function(Init);
-    function(DetectRawDevices);
-    function(OpenRawDeviceUncached);
+    function(DetectRawDevices); // async
+    function(OpenRawDeviceUncached); // async
     function(Open_Raw_Device);
-    function(ReleaseDevice);
+    function(ReleaseDevice);// async
     function(Get_Friendlyname);
     function(Get_Modelname);
     function(Get_Serialnumber);
     function(Get_Deviceversion);
-    function(GetStorage);
-    function(Get_Files_And_Folders);
+    function(GetStorage);// async
+    function(GetFilesAndFolders);// async
     function(Get_File_To_File);
     function(Get_File_To_File_Descriptor);
     function(Get_File_To_Handler);

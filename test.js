@@ -60,35 +60,35 @@ async function run(resetmtp = false, searchDir = null) {
     console.log(`========================`);
   }
 
-  if (resetmtp) {
-    const {
-      error: listMtpFileTreeError,
-      data: listMtpFileTreeData
-    } = await mtpObj.listMtpFileTree({
-      folderId: MTP_FLAGS.FILES_AND_FOLDERS_ROOT,
-      recursive: false
-    });
+  /*  if (resetmtp) {
+      const {
+        error: listMtpFileTreeError,
+        data: listMtpFileTreeData
+      } = await mtpObj.listMtpFileTree({
+        folderId: MTP_FLAGS.FILES_AND_FOLDERS_ROOT,
+        recursive: false
+      });
 
-    if (listMtpFileTreeError) {
-      console.error(listMtpFileTreeError);
+      if (listMtpFileTreeError) {
+        console.error(listMtpFileTreeError);
+        return;
+      }
+
+      if (searchDir) {
+        console.error(findLodash(listMtpFileTreeData, { name: searchDir }));
+        return;
+      }
+
+      console.error(listMtpFileTreeData);
       return;
-    }
-
-    if (searchDir) {
-      console.error(findLodash(listMtpFileTreeData, { name: searchDir }));
-      return;
-    }
-
-    console.error(listMtpFileTreeData);
-    return;
-  }
+    }*/
 
   /**
    * =====================================================================
    * Resolve Path
    */
 
-  /*  const {
+  /*const {
     error: resolvePathError,
     data: resolvePathData
   } = await mtpObj.resolvePath({
@@ -104,23 +104,70 @@ async function run(resetmtp = false, searchDir = null) {
 
   /**
    * =====================================================================
+   * List MTP File Tree (__listMtpFileTree)
+   */
+
+  const {
+    error: listMtpFileTreeError,
+    data: listMtpFileTreeData
+  } = await mtpObj.__listMtpFileTree({
+    folderId: 36,
+    recursive: true,
+    parentPath: '/'
+  });
+
+  if (listMtpFileTreeError) {
+    console.log(`========================`);
+    console.log(`listMtpFileTreeError`);
+    console.error(listMtpFileTreeError);
+    console.log(`========================`);
+    return;
+  }
+
+  if (listMtpFileTreeData) {
+    console.log(`========================`);
+    console.log(`listMtpFileTreeData`);
+    console.error(listMtpFileTreeData);
+    console.log(`========================`);
+  }
+
+  /**
+   * =====================================================================
    * List MTP File Tree
    */
+
+  /* const {
+     error: listMtpFileTreeError,
+     data: listMtpFileTreeData
+   } = await mtpObj.listMtpFileTree({
+     recursive: false,
+     folderPath: '/ABCD'
+   });*/
 
   /*  const {
       error: listMtpFileTreeError,
       data: listMtpFileTreeData
-    } = await mtpObj.listMtpFileTree({
+    } = await mtpObj.__listMtpFileTree({
+      folderId: 36,
       recursive: true,
-      folderPath: '/ABCD'
+      parentPath: '/'
     });
 
     if (listMtpFileTreeError) {
+      console.log(`========================`);
+      console.log(`listMtpFileTreeError`);
       console.error(listMtpFileTreeError);
+      console.log(`========================`);
       return;
     }
 
-    console.log(listMtpFileTreeData);*/
+    if (listMtpFileTreeData) {
+      console.log(`========================`);
+      console.log(`listMtpFileTreeData`);
+      console.error(listMtpFileTreeData);
+      console.log(`========================`);
+    }*/
+
   /**
    * =====================================================================
    * List Local File Tree
