@@ -428,28 +428,6 @@ std::string Get_Friendlyname(MtpDeviceT device) {
     return result;
 }
 
-std::string Get_Modelname(MtpDeviceT device) {
-    char *fn = LIBMTP_Get_Modelname(device.m_device);
-    std::string result(fn);
-    free(fn);
-    return result;
-}
-
-std::string Get_Serialnumber(MtpDeviceT device) {
-    char *fn = LIBMTP_Get_Serialnumber(device.m_device);
-    std::string result(fn);
-    free(fn);
-    return result;
-}
-
-std::string Get_Deviceversion(MtpDeviceT device) {
-    char *fn = LIBMTP_Get_Deviceversion(device.m_device);
-    std::string result(fn);
-    free(fn);
-    return result;
-}
-
-
 MtpDeviceT Open_Raw_Device(RawDeviceT rawDevice) {
     return MtpDeviceT(LIBMTP_Open_Raw_Device(rawDevice.get()));
 }
@@ -540,6 +518,7 @@ int parse_path(char *path, LIBMTP_file_t *files, LIBMTP_folder_t *folders) {
     return -1;
 }
 
+
 int pathToId(const std::string path, FileT fileData, FolderT folderData) {
     char *cPath = strdup(path.c_str());
     int _return = parse_path(cPath, fileData.get(), folderData.get());
@@ -548,6 +527,28 @@ int pathToId(const std::string path, FileT fileData, FolderT folderData) {
 
     return _return;
 }
+
+std::string Get_Modelname(MtpDeviceT device) {
+    char *fn = LIBMTP_Get_Modelname(device.m_device);
+    std::string result(fn);
+    free(fn);
+    return result;
+}
+
+std::string Get_Serialnumber(MtpDeviceT device) {
+    char *fn = LIBMTP_Get_Serialnumber(device.m_device);
+    std::string result(fn);
+    free(fn);
+    return result;
+}
+
+std::string Get_Deviceversion(MtpDeviceT device) {
+    char *fn = LIBMTP_Get_Deviceversion(device.m_device);
+    std::string result(fn);
+    free(fn);
+    return result;
+}
+
 
 /*
  * WorkerDetectRawDevices
@@ -792,6 +793,63 @@ void ReleaseDevice(MtpDeviceT device, nbind::cbFunction &callback) {
     uv_queue_work(uv_default_loop(), &work->worker, ReleaseDeviceRunner, ReleaseDeviceDone);
 }
 
+
+/*
+ * resolvePath
+ */
+
+class WorkerReleaseDevice {
+public:
+    WorkerReleaseDevice(MtpDeviceT device, nbind::cbFunction cb) :
+            callback(cb), device(device) {}
+
+    uv_work_t worker;
+    nbind::cbFunction callback;
+
+    bool error;
+    std::string errorMsg;
+
+    MtpDeviceT device;
+};
+
+void ReleaseDeviceDone(uv_work_t *order, int status) {
+    Isolate *isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
+
+    WorkerReleaseDevice *work = static_cast< WorkerReleaseDevice * >( order->data );
+
+    if (work->error) {
+        work->callback.call<void>(work->errorMsg.c_str());
+    } else {
+        work->callback.call<void>(NULL);
+    }
+
+    // Memory cleanup
+    work->callback.reset();
+    delete work;
+}
+
+void ReleaseDeviceRunner(uv_work_t *order) {
+    WorkerReleaseDevice *work = static_cast< WorkerReleaseDevice * >( order->data );
+
+    try {
+        LIBMTP_Release_Device(work->device.m_device);
+    }
+    catch (...) {
+        work->error = true;
+        work->errorMsg = "Error occured while releasing the MTP device";
+    }
+}
+
+void ReleaseDevice(MtpDeviceT device, nbind::cbFunction &callback) {
+    WorkerReleaseDevice *work = new WorkerReleaseDevice(device, callback);
+
+    work->worker.data = work;
+    work->device = device;
+    work->error = false;
+
+    uv_queue_work(uv_default_loop(), &work->worker, ReleaseDeviceRunner, ReleaseDeviceDone);
+}
 
 void Init() {
     LIBMTP_Init();

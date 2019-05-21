@@ -60,7 +60,7 @@ async function run(resetmtp = false, searchDir = null) {
     console.log(`========================`);
   }
 
-  /* if (resetmtp) {
+  if (resetmtp) {
     const {
       error: listMtpFileTreeError,
       data: listMtpFileTreeData
@@ -81,7 +81,7 @@ async function run(resetmtp = false, searchDir = null) {
 
     console.error(listMtpFileTreeData);
     return;
-  }*/
+  }
 
   /**
    * =====================================================================
