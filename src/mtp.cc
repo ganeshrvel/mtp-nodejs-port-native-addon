@@ -269,18 +269,6 @@ void Destroy_file(MtpDeviceT device, uint32_t const id) {
     LIBMTP_Delete_Object(device.m_device, id);
 }
 
-int Create_Folder(MtpDeviceT device,
-                  const std::string fileName,
-                  int const parentId,
-                  int const storageId) {
-
-    char *cFileName = strdup(fileName.c_str());
-
-    int _return = LIBMTP_Create_Folder(device.m_device, cFileName, parentId, storageId);
-    free(cFileName);
-
-    return _return;
-}
 
 class SharedBuffer {
 public:
@@ -962,6 +950,78 @@ void SetFileName(MtpDeviceT device, FileT file, const std::string path, nbind::c
     uv_queue_work(uv_default_loop(), &work->worker, SetFileNameRunner, SetFileNameDone);
 }
 
+
+/*
+ * WorkerSetFileName
+ */
+class WorkerCreateFolder {
+public://fileName, parentId, storageId,
+    WorkerCreateFolder(MtpDeviceT device, std::string fileName, int parentId, int storageId, nbind::cbFunction cb) :
+            callback(cb), device(device), fileName(fileName), parentId(parentId), storageId(storageId) {};
+
+    uv_work_t worker;
+    nbind::cbFunction callback;
+
+    bool error;
+    std::string errorMsg;
+
+    MtpDeviceT device;
+    std::string fileName;
+    int parentId;
+    int storageId;
+    int output;
+};
+
+void CreateFolderDone(uv_work_t *order, int status) {
+    Isolate *isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
+
+    WorkerCreateFolder *work = static_cast< WorkerCreateFolder * >( order->data );
+
+    if (work->error) {
+        work->callback.call<void>(work->errorMsg.c_str(), work->output);
+    } else {
+        work->callback.call<void>(NULL, work->output);
+    }
+
+    // Memory cleanup
+    work->callback.reset();
+    delete work;
+}
+
+void CreateFolderRunner(uv_work_t *order) {
+    WorkerCreateFolder *work = static_cast< WorkerCreateFolder * >( order->data );
+
+    try {
+        char *cFileName = strdup(work->fileName.c_str());
+
+        int result = LIBMTP_Create_Folder(work->device.m_device, cFileName, work->parentId, work->storageId);
+        free(cFileName);
+
+        work->output = result;
+    }
+    catch (...) {
+        work->error = true;
+        work->errorMsg = "Error occured while creating a new directory";
+    }
+}
+
+void CreateFolder(MtpDeviceT device,
+                  const std::string fileName,
+                  int const parentId,
+                  int const storageId, nbind::cbFunction &callback) {
+    WorkerCreateFolder *work = new WorkerCreateFolder(device, fileName, parentId, storageId, callback);
+
+    work->worker.data = work;
+    work->device = device;
+    work->fileName = fileName;
+    work->parentId = parentId;
+    work->storageId = storageId;
+    work->error = false;
+
+    uv_queue_work(uv_default_loop(), &work->worker, CreateFolderRunner, CreateFolderDone);
+}
+
 void Init() {
     LIBMTP_Init();
 }
@@ -1040,6 +1100,6 @@ NBIND_GLOBAL() {
     function(GetFileMetaData); //async
     function(SetFileName); //async
     function(Destroy_file);
-    function(Create_Folder);
+    function(CreateFolder); //async
     function(pathToId);
 };

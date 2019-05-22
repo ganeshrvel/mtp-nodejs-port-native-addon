@@ -198,32 +198,32 @@ async function run(resetmtp = false, searchDir = null) {
    * =====================================================================
    * Rename File
    */
-  const {
-    error: renameFileError,
-    data: renameFileData
-  } = await mtpObj.renameFile({
-    filePath: '/ABDC',
-    newfileName: 'ABCD'
-  });
+  /*  const {
+      error: renameFileError,
+      data: renameFileData
+    } = await mtpObj.renameFile({
+      filePath: '/ABDC',
+      newfileName: 'ABCD'
+    });
 
-  if (renameFileError) {
-    console.error(renameFileError);
-  }
+    if (renameFileError) {
+      console.error(renameFileError);
+    }
 
-  if (renameFileError) {
-    console.log(`========================`);
-    console.log(`renameFileError`);
-    console.error(renameFileError);
-    console.log(`========================`);
-    return;
-  }
+    if (renameFileError) {
+      console.log(`========================`);
+      console.log(`renameFileError`);
+      console.error(renameFileError);
+      console.log(`========================`);
+      return;
+    }
 
-  if (renameFileData) {
-    console.log(`========================`);
-    console.log(`renameFileData`);
-    console.log(renameFileData);
-    console.log(`========================`);
-  }
+    if (renameFileData) {
+      console.log(`========================`);
+      console.log(`renameFileData`);
+      console.log(renameFileData);
+      console.log(`========================`);
+    }*/
 
   /**
    * =====================================================================
@@ -281,19 +281,29 @@ async function run(resetmtp = false, searchDir = null) {
    * =====================================================================
    * Create Folder
    */
-  /*  const {
+  const {
     error: createFolderError,
     data: createFolderData
   } = await mtpObj.createFolder({
-    newFolderPath: '/ABCD'
+    newFolderPath: '/ABCD/get/abc'
+    // parentId: 36,
+    //  newFolderName: 'get'
   });
 
   if (createFolderError) {
+    console.log(`========================`);
+    console.log(`createFolderError`);
     console.error(createFolderError);
+    console.log(`========================`);
+    return;
   }
+
   if (createFolderData) {
+    console.log(`========================`);
+    console.log(`createFolderData`);
     console.log(createFolderData);
-  }*/
+    console.log(`========================`);
+  }
 
   /**
    * =====================================================================
