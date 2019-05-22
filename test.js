@@ -198,17 +198,32 @@ async function run(resetmtp = false, searchDir = null) {
    * =====================================================================
    * Rename File
    */
-  /*  const {
+  const {
     error: renameFileError,
     data: renameFileData
   } = await mtpObj.renameFile({
-    filePath: '/ABCD',
-    newfileName: 'ABDC'
+    filePath: '/ABDC',
+    newfileName: 'ABCD'
   });
 
   if (renameFileError) {
     console.error(renameFileError);
-  }*/
+  }
+
+  if (renameFileError) {
+    console.log(`========================`);
+    console.log(`renameFileError`);
+    console.error(renameFileError);
+    console.log(`========================`);
+    return;
+  }
+
+  if (renameFileData) {
+    console.log(`========================`);
+    console.log(`renameFileData`);
+    console.log(renameFileData);
+    console.log(`========================`);
+  }
 
   /**
    * =====================================================================
@@ -239,27 +254,27 @@ async function run(resetmtp = false, searchDir = null) {
    * =====================================================================
    * File Exists
    */
-  const {
-    error: fileExistsError,
-    data: fileExistsData
-  } = await mtpObj.fileExists({
-    filePath: '/WhatsApp'
-  });
+  /*  const {
+      error: fileExistsError,
+      data: fileExistsData
+    } = await mtpObj.fileExists({
+      filePath: '/WhatsApp'
+    });
 
-  if (fileExistsError) {
-    console.log(`========================`);
-    console.log(`getFileInfoError`);
-    console.error(fileExistsError);
-    console.log(`========================`);
-    return;
-  }
+    if (fileExistsError) {
+      console.log(`========================`);
+      console.log(`getFileInfoError`);
+      console.error(fileExistsError);
+      console.log(`========================`);
+      return;
+    }
 
-  if (fileExistsData) {
-    console.log(`========================`);
-    console.log(`fileExistsData`);
-    console.log(fileExistsData);
-    console.log(`========================`);
-  }
+    if (fileExistsData) {
+      console.log(`========================`);
+      console.log(`fileExistsData`);
+      console.log(fileExistsData);
+      console.log(`========================`);
+    }*/
 
 
   /**

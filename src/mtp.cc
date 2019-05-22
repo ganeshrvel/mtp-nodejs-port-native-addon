@@ -265,10 +265,6 @@ int Send_File_From_Handler(MtpDeviceT device, nbind::cbFunction &dataGetCB, File
                                          FileProgressCallback, (const void *) &progressCB);
 }
 
-int Set_File_Name(MtpDeviceT device, FileT file, const std::string path) {
-    return LIBMTP_Set_File_Name(device.m_device, file.get(), path.c_str());
-}
-
 void Destroy_file(MtpDeviceT device, uint32_t const id) {
     LIBMTP_Delete_Object(device.m_device, id);
 }
@@ -904,6 +900,67 @@ void GetFileMetaData(MtpDeviceT device, uint32_t const fileId, nbind::cbFunction
     uv_queue_work(uv_default_loop(), &work->worker, GetFileMetaDataRunner, GetFileMetaDataDone);
 }
 
+/*
+ * WorkerSetFileName
+ */
+
+class WorkerSetFileName {
+public:
+    WorkerSetFileName(MtpDeviceT device, FileT file, std::string path, nbind::cbFunction cb) :
+            callback(cb), device(device), file(file), path(path) {};
+
+    uv_work_t worker;
+    nbind::cbFunction callback;
+
+    bool error;
+    std::string errorMsg;
+
+    MtpDeviceT device;
+    FileT file;
+    std::string path;
+    int output;
+};
+
+void SetFileNameDone(uv_work_t *order, int status) {
+    Isolate *isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
+
+    WorkerSetFileName *work = static_cast< WorkerSetFileName * >( order->data );
+
+    if (work->error) {
+        work->callback.call<void>(work->errorMsg.c_str(), work->output);
+    } else {
+        work->callback.call<void>(NULL, work->output);
+    }
+
+    // Memory cleanup
+    work->callback.reset();
+    delete work;
+}
+
+void SetFileNameRunner(uv_work_t *order) {
+    WorkerSetFileName *work = static_cast< WorkerSetFileName * >( order->data );
+
+    try {
+        work->output = LIBMTP_Set_File_Name(work->device.m_device, work->file.get(), work->path.c_str());
+    }
+    catch (...) {
+        work->error = true;
+        work->errorMsg = "Error occured while renaming the file";
+    }
+}
+
+void SetFileName(MtpDeviceT device, FileT file, const std::string path, nbind::cbFunction &callback) {
+    WorkerSetFileName *work = new WorkerSetFileName(device, file, path, callback);
+
+    work->worker.data = work;
+    work->device = device;
+    work->file = file;
+    work->path = path;
+    work->error = false;
+
+    uv_queue_work(uv_default_loop(), &work->worker, SetFileNameRunner, SetFileNameDone);
+}
 
 void Init() {
     LIBMTP_Init();
@@ -981,7 +1038,7 @@ NBIND_GLOBAL() {
     function(Send_File_From_Handler);
     function(Send_File_From_Device);
     function(GetFileMetaData); //async
-    function(Set_File_Name);
+    function(SetFileName); //async
     function(Destroy_file);
     function(Create_Folder);
     function(pathToId);
