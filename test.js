@@ -129,7 +129,7 @@ async function run(resetmtp = false, searchDir = null) {
   if (listMtpFileTreeData) {
     console.log(`========================`);
     console.log(`listMtpFileTreeData`);
-    console.error(listMtpFileTreeData);
+    console.log(listMtpFileTreeData);
     console.log(`========================`);
   }*/
 
@@ -157,7 +157,7 @@ async function run(resetmtp = false, searchDir = null) {
   if (listMtpFileTreeData) {
     console.log(`========================`);
     console.log(`listMtpFileTreeData`);
-    console.error(listMtpFileTreeData);
+    console.log(listMtpFileTreeData);
     console.log(`========================`);
   }*/
 
@@ -215,31 +215,30 @@ async function run(resetmtp = false, searchDir = null) {
    * Get file info
    */
 
-  const {
-    error: getFileInfoError,
-    data: getFileInfoData
-  } = await mtpObj.getFileInfo({ filePath: '/WhatsApp' });
+  /*  const {
+      error: getFileInfoError,
+      data: getFileInfoData
+    } = await mtpObj.getFileInfo({ filePath: '/WhatsApp' });
 
-  if (getFileInfoError) {
-    console.log(`========================`);
-    console.log(`getFileInfoError`);
-    console.error(getFileInfoError);
-    console.log(`========================`);
-    return;
-  }
+    if (getFileInfoError) {
+      console.log(`========================`);
+      console.log(`getFileInfoError`);
+      console.error(getFileInfoError);
+      console.log(`========================`);
+      return;
+    }
 
-  if (getFileInfoData) {
-    console.log(`========================`);
-    console.log(`getFileInfoData`);
-    console.error(getFileInfoData);
-    console.log(`========================`);
-  }
+    if (getFileInfoData) {
+      console.log(`========================`);
+      console.log(`getFileInfoData`);
+      console.log(getFileInfoData);
+      console.log(`========================`);
+    }*/
 
   /**
    * =====================================================================
    * File Exists
    */
-  /*
   const {
     error: fileExistsError,
     data: fileExistsData
@@ -248,10 +247,20 @@ async function run(resetmtp = false, searchDir = null) {
   });
 
   if (fileExistsError) {
+    console.log(`========================`);
+    console.log(`getFileInfoError`);
     console.error(fileExistsError);
+    console.log(`========================`);
+    return;
   }
 
-  console.log(fileExistsData);*/
+  if (fileExistsData) {
+    console.log(`========================`);
+    console.log(`fileExistsData`);
+    console.log(fileExistsData);
+    console.log(`========================`);
+  }
+
 
   /**
    * =====================================================================
