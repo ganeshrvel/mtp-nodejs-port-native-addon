@@ -397,17 +397,6 @@ int Send_File_From_Device(MtpDeviceT device, MtpDeviceT fromDevice, uint32_t con
     return result;
 }
 
-
-FileT Get_Filemetadata(MtpDeviceT device, uint32_t const id) {
-    LIBMTP_file_t *file = LIBMTP_Get_Filemetadata(device.m_device, id);
-
-    FileT result(file);
-
-    LIBMTP_destroy_file_t(file);
-
-    return result;
-}
-
 std::string Get_Friendlyname(MtpDeviceT device) {
     char *fn = LIBMTP_Get_Friendlyname(device.m_device);
     std::string result(fn);
@@ -784,22 +773,6 @@ void ReleaseDevice(MtpDeviceT device, nbind::cbFunction &callback) {
  * WorkerGetFilesAndFolders
  */
 
-/*
-std::vector<FileT> GetFilesAndFolders__(MtpDeviceT device, uint32_t const storage, uint32_t const parent) {
-    std::vector<FileT> result;
-    LIBMTP_file_t *next = nullptr;
-
-    for (LIBMTP_file_t *file = LIBMTP_Get_Files_And_Folders(device.m_device, storage, parent);
-         nullptr != file; file = next) {
-        result.push_back(file);
-        next = file->next;
-        LIBMTP_destroy_file_t(file);
-    }
-
-    return result;
-}
-*/
-
 class WorkerGetFilesAndFolders {
 public:
     WorkerGetFilesAndFolders(MtpDeviceT device, uint32_t storage, uint32_t parent, nbind::cbFunction cb) :
@@ -816,7 +789,6 @@ public:
     uint32_t parent;
     std::vector<FileT> output;
 };
-
 
 void GetFilesAndFoldersDone(uv_work_t *order, int status) {
     Isolate *isolate = Isolate::GetCurrent();
@@ -867,6 +839,72 @@ void GetFilesAndFolders(MtpDeviceT device, uint32_t const storage, uint32_t cons
 }
 
 
+/*
+ * WorkerGetFilesAndFolders
+ */
+
+class WorkerGetFileMetaData {
+public:
+    WorkerGetFileMetaData(MtpDeviceT device, uint32_t fileId, nbind::cbFunction cb) :
+            callback(cb), device(device), fileId(fileId) {};
+
+    uv_work_t worker;
+    nbind::cbFunction callback;
+
+    bool error;
+    std::string errorMsg;
+
+    MtpDeviceT device;
+    uint32_t fileId;
+    FileT output;
+};
+
+void GetFileMetaDataDone(uv_work_t *order, int status) {
+    Isolate *isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
+
+    WorkerGetFileMetaData *work = static_cast< WorkerGetFileMetaData * >( order->data );
+
+    if (work->error) {
+        work->callback.call<void>(work->errorMsg.c_str(), work->output);
+    } else {
+        work->callback.call<void>(NULL, work->output);
+    }
+
+    // Memory cleanup
+    work->callback.reset();
+    delete work;
+}
+
+void GetFileMetaDataRunner(uv_work_t *order) {
+    WorkerGetFileMetaData *work = static_cast< WorkerGetFileMetaData * >( order->data );
+
+    try {
+        LIBMTP_file_t *file = LIBMTP_Get_Filemetadata(work->device.m_device, work->fileId);
+        FileT result(file);
+
+        LIBMTP_destroy_file_t(file);
+
+        work->output = result;
+    }
+    catch (...) {
+        work->error = true;
+        work->errorMsg = "Error occured while fetching the meta data";
+    }
+}
+
+void GetFileMetaData(MtpDeviceT device, uint32_t const fileId, nbind::cbFunction &callback) {
+    WorkerGetFileMetaData *work = new WorkerGetFileMetaData(device, fileId, callback);
+
+    work->worker.data = work;
+    work->device = device;
+    work->fileId = fileId;
+    work->error = false;
+
+    uv_queue_work(uv_default_loop(), &work->worker, GetFileMetaDataRunner, GetFileMetaDataDone);
+}
+
+
 void Init() {
     LIBMTP_Init();
 }
@@ -881,7 +919,7 @@ NBIND_CLASS(FileT){
         getset(getParentId, setParentId);
         getset(getStorageId, setStorageId);
         getter(getModificationDate);
-}
+};
 
 NBIND_CLASS(FolderT){
         construct<>();
@@ -892,20 +930,20 @@ NBIND_CLASS(FolderT){
         getset(getStorageId, setStorageId);
         getter(getChild);
         getter(getSibling);
-}
+};
 
 NBIND_CLASS(MtpDeviceT){
         construct<>();
         construct<const MtpDeviceT&>();
         method(getStorages);
-}
+};
 
 NBIND_CLASS(DeviceStorageT){
         construct<>();
         construct<const DeviceStorageT&>();
         getset(getId, setId);
         getset(getDescription, setDescription);
-}
+};
 
 NBIND_CLASS(RawDeviceT){
         construct<LIBMTP_raw_device_t>();
@@ -913,7 +951,7 @@ NBIND_CLASS(RawDeviceT){
         getset(getBusLocation, setBusLocation);
         getset(getDevNum, setDevNum);
         getter(getVendor);
-}
+};
 
 NBIND_CLASS(DataBufferT){
         construct<const DataBufferT &>();
@@ -921,7 +959,7 @@ NBIND_CLASS(DataBufferT){
         getter(getSize);
         method(read);
         method(write);
-}
+};
 
 NBIND_GLOBAL() {
     function(Init);
@@ -942,9 +980,9 @@ NBIND_GLOBAL() {
     function(Send_File_From_File_Descriptor);
     function(Send_File_From_Handler);
     function(Send_File_From_Device);
-    function(Get_Filemetadata);
+    function(GetFileMetaData); //async
     function(Set_File_Name);
     function(Destroy_file);
     function(Create_Folder);
     function(pathToId);
-}
+};

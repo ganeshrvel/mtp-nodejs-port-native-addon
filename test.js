@@ -88,18 +88,20 @@ async function run(resetmtp = false, searchDir = null) {
    * Resolve Path
    */
 
-  const {
-    error: resolvePathError,
-    data: resolvePathData
-  } = await mtpObj.resolvePath({
-    filePath: '/ABCD/'
-  });
+  /*
+    const {
+      error: resolvePathError,
+      data: resolvePathData
+    } = await mtpObj.resolvePath({
+      filePath: '/ABCD/'
+    });
 
-  if (resolvePathError) {
-    console.error(resolvePathError);
-    return;
-  }
-  console.log(resolvePathData);
+    if (resolvePathError) {
+      console.error(resolvePathError);
+      return;
+    }
+    console.log(resolvePathData);
+  */
 
 
   /**
@@ -213,15 +215,25 @@ async function run(resetmtp = false, searchDir = null) {
    * Get file info
    */
 
-  /*  const {
+  const {
     error: getFileInfoError,
     data: getFileInfoData
-  } = await mtpObj.getFileInfo({ filePath: '/ABCDE' });
+  } = await mtpObj.getFileInfo({ filePath: '/WhatsApp' });
 
   if (getFileInfoError) {
+    console.log(`========================`);
+    console.log(`getFileInfoError`);
     console.error(getFileInfoError);
+    console.log(`========================`);
+    return;
   }
-  console.log(getFileInfoData);*/
+
+  if (getFileInfoData) {
+    console.log(`========================`);
+    console.log(`getFileInfoData`);
+    console.error(getFileInfoData);
+    console.log(`========================`);
+  }
 
   /**
    * =====================================================================
