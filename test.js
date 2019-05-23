@@ -138,28 +138,28 @@ async function run(resetmtp = false, searchDir = null) {
    * List MTP File Tree
    */
 
-  /*const {
-    error: listMtpFileTreeError,
-    data: listMtpFileTreeData
-  } = await mtpObj.listMtpFileTree({
-    recursive: false,
-    folderPath: '/ABCD'
-  });
+  /*  const {
+      error: listMtpFileTreeError,
+      data: listMtpFileTreeData
+    } = await mtpObj.listMtpFileTree({
+      recursive: false,
+      folderPath: '/DCIM'
+    });
 
-  if (listMtpFileTreeError) {
-    console.log(`========================`);
-    console.log(`listMtpFileTreeError`);
-    console.error(listMtpFileTreeError);
-    console.log(`========================`);
-    return;
-  }
+    if (listMtpFileTreeError) {
+      console.log(`========================`);
+      console.log(`listMtpFileTreeError`);
+      console.error(listMtpFileTreeError);
+      console.log(`========================`);
+      return;
+    }
 
-  if (listMtpFileTreeData) {
-    console.log(`========================`);
-    console.log(`listMtpFileTreeData`);
-    console.log(listMtpFileTreeData);
-    console.log(`========================`);
-  }*/
+    if (listMtpFileTreeData) {
+      console.log(`========================`);
+      console.log(`listMtpFileTreeData`);
+      console.log(listMtpFileTreeData);
+      console.log(`========================`);
+    }*/
 
   /**
    * =====================================================================
@@ -184,26 +184,26 @@ async function run(resetmtp = false, searchDir = null) {
    * =====================================================================
    * List Delete file
    */
+  /*
+      const {
+      error: deleteFileError,
+        data: deleteFileData
+      } = await mtpObj.deleteFile({ filePath: '/aaa' });
 
-  const {
-    error: deleteFileError,
-    data: deleteFileData
-  } = await mtpObj.deleteFile({ filePath: '/aaa' });
+      if (deleteFileError) {
+        console.log(`========================`);
+        console.log(`deleteFileError`);
+        console.error(deleteFileError);
+        console.log(`========================`);
+        return;
+      }
 
-  if (deleteFileError) {
-    console.log(`========================`);
-    console.log(`deleteFileError`);
-    console.error(deleteFileError);
-    console.log(`========================`);
-    return;
-  }
-
-  if (deleteFileData) {
-    console.log(`========================`);
-    console.log(`deleteFileData`);
-    console.log(deleteFileData);
-    console.log(`========================`);
-  }
+      if (deleteFileData) {
+        console.log(`========================`);
+        console.log(`deleteFileData`);
+        console.log(deleteFileData);
+        console.log(`========================`);
+      }*/
 
   /**
    * =====================================================================
