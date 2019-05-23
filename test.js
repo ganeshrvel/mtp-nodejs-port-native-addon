@@ -185,14 +185,25 @@ async function run(resetmtp = false, searchDir = null) {
    * List Delete file
    */
 
-  /*    const {
+  const {
     error: deleteFileError,
     data: deleteFileData
-  } = await mtpObj.deleteFile({ filePath: '/ABCD' });
+  } = await mtpObj.deleteFile({ filePath: '/aaa' });
 
   if (deleteFileError) {
+    console.log(`========================`);
+    console.log(`deleteFileError`);
     console.error(deleteFileError);
-  }*/
+    console.log(`========================`);
+    return;
+  }
+
+  if (deleteFileData) {
+    console.log(`========================`);
+    console.log(`deleteFileData`);
+    console.log(deleteFileData);
+    console.log(`========================`);
+  }
 
   /**
    * =====================================================================
@@ -281,29 +292,31 @@ async function run(resetmtp = false, searchDir = null) {
    * =====================================================================
    * Create Folder
    */
-  const {
-    error: createFolderError,
-    data: createFolderData
-  } = await mtpObj.createFolder({
-    newFolderPath: '/ABCD/get/abc'
-    // parentId: 36,
-    //  newFolderName: 'get'
-  });
+  /*
+    const {
+      error: createFolderError,
+      data: createFolderData
+    } = await mtpObj.createFolder({
+      newFolderPath: '/ABCD/get/abc'
+      // parentId: 36,
+      //  newFolderName: 'get'
+    });
 
-  if (createFolderError) {
-    console.log(`========================`);
-    console.log(`createFolderError`);
-    console.error(createFolderError);
-    console.log(`========================`);
-    return;
-  }
+    if (createFolderError) {
+      console.log(`========================`);
+      console.log(`createFolderError`);
+      console.error(createFolderError);
+      console.log(`========================`);
+      return;
+    }
 
-  if (createFolderData) {
-    console.log(`========================`);
-    console.log(`createFolderData`);
-    console.log(createFolderData);
-    console.log(`========================`);
-  }
+    if (createFolderData) {
+      console.log(`========================`);
+      console.log(`createFolderData`);
+      console.log(createFolderData);
+      console.log(`========================`);
+    }
+  */
 
   /**
    * =====================================================================

@@ -265,11 +265,6 @@ int Send_File_From_Handler(MtpDeviceT device, nbind::cbFunction &dataGetCB, File
                                          FileProgressCallback, (const void *) &progressCB);
 }
 
-void Destroy_file(MtpDeviceT device, uint32_t const id) {
-    LIBMTP_Delete_Object(device.m_device, id);
-}
-
-
 class SharedBuffer {
 public:
     SharedBuffer() : data(0), size(0), done(false) {}
@@ -955,7 +950,7 @@ void SetFileName(MtpDeviceT device, FileT file, const std::string path, nbind::c
  * WorkerSetFileName
  */
 class WorkerCreateFolder {
-public://fileName, parentId, storageId,
+public:
     WorkerCreateFolder(MtpDeviceT device, std::string fileName, int parentId, int storageId, nbind::cbFunction cb) :
             callback(cb), device(device), fileName(fileName), parentId(parentId), storageId(storageId) {};
 
@@ -1020,6 +1015,69 @@ void CreateFolder(MtpDeviceT device,
     work->error = false;
 
     uv_queue_work(uv_default_loop(), &work->worker, CreateFolderRunner, CreateFolderDone);
+}
+
+/*
+ * WorkerSetFileName
+ */
+
+class WorkerDestroyFile {
+public:
+    WorkerDestroyFile(MtpDeviceT device, int fileId, nbind::cbFunction cb) :
+            callback(cb), device(device), fileId(fileId) {};
+
+    uv_work_t worker;
+    nbind::cbFunction callback;
+
+    bool error;
+    std::string errorMsg;
+
+    MtpDeviceT device;
+    int fileId;
+    int output;
+};
+
+void DestroyFileDone(uv_work_t *order, int status) {
+    Isolate *isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
+
+    WorkerDestroyFile *work = static_cast< WorkerDestroyFile * >( order->data );
+
+    if (work->error) {
+        work->callback.call<void>(work->errorMsg.c_str(), work->output);
+    } else {
+        work->callback.call<void>(NULL, work->output);
+    }
+
+    // Memory cleanup
+    work->callback.reset();
+    delete work;
+}
+
+void DestroyFileRunner(uv_work_t *order) {
+    WorkerDestroyFile *work = static_cast< WorkerDestroyFile * >( order->data );
+
+    try {
+        LIBMTP_Delete_Object(work->device.m_device, work->fileId);
+
+        work->output = true;
+    }
+    catch (...) {
+        work->error = true;
+        work->errorMsg = "Error occured while deleting the file";
+    }
+}
+
+void DestroyFile(MtpDeviceT device,
+                 uint32_t const fileId, nbind::cbFunction &callback) {
+    WorkerDestroyFile *work = new WorkerDestroyFile(device, fileId, callback);
+
+    work->worker.data = work;
+    work->device = device;
+    work->fileId = fileId;
+    work->error = false;
+
+    uv_queue_work(uv_default_loop(), &work->worker, DestroyFileRunner, DestroyFileDone);
 }
 
 void Init() {
@@ -1099,7 +1157,7 @@ NBIND_GLOBAL() {
     function(Send_File_From_Device);
     function(GetFileMetaData); //async
     function(SetFileName); //async
-    function(Destroy_file);
+    function(DestroyFile); //async
     function(CreateFolder); //async
     function(pathToId);
 };
