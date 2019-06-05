@@ -235,10 +235,6 @@ uint16_t MTPDataGetCallback(void *params, void *priv, uint32_t wantlen, unsigned
     return LIBMTP_HANDLER_RETURN_OK;
 }
 
-int Get_File_To_File(MtpDeviceT device, uint32_t const id, const std::string path, nbind::cbFunction &cb) {
-    return LIBMTP_Get_File_To_File(device.m_device, id, path.c_str(), FileProgressCallback, (const void *) &cb);
-}
-
 int Get_File_To_File_Descriptor(MtpDeviceT device, uint32_t const id, int const fd, nbind::cbFunction &cb) {
     return LIBMTP_Get_File_To_File_Descriptor(device.m_device, id, fd, FileProgressCallback, (const void *) &cb);
 }
@@ -947,7 +943,7 @@ void SetFileName(MtpDeviceT device, FileT file, const std::string path, nbind::c
 
 
 /*
- * WorkerSetFileName
+ * WorkerCreateFolder
  */
 class WorkerCreateFolder {
 public:
@@ -1018,7 +1014,7 @@ void CreateFolder(MtpDeviceT device,
 }
 
 /*
- * WorkerSetFileName
+ * WorkerDestroyFile
  */
 
 class WorkerDestroyFile {
@@ -1079,6 +1075,106 @@ void DestroyFile(MtpDeviceT device,
 
     uv_queue_work(uv_default_loop(), &work->worker, DestroyFileRunner, DestroyFileDone);
 }
+
+/*
+ * WorkerGetFileToFile
+ */
+
+int Get_File_To_File(MtpDeviceT device, uint32_t const id, const std::string path, nbind::cbFunction &cb) {
+    return LIBMTP_Get_File_To_File(device.m_device, id, path.c_str(), FileProgressCallback, (const void *) &cb);
+}
+
+class WorkerGetFileToFile {
+public:
+    WorkerGetFileToFile(MtpDeviceT device, int fileId, std::string path,
+                        nbind::cbFunction cb) :
+            callback(cb), device(device), fileId(fileId), path(path) {};
+
+    uv_work_t worker;
+    nbind::cbFunction callback;
+
+    bool error;
+    std::string errorMsg;
+
+    MtpDeviceT device;
+    int fileId;
+    std::string path;
+    int output;
+};
+
+void GetFileToFileDone(uv_work_t *order, int status) {
+    Isolate *isolate = Isolate::GetCurrent();
+    HandleScope handleScope(isolate);
+
+    WorkerGetFileToFile *work = static_cast< WorkerGetFileToFile * >( order->data );
+
+    if (work->error) {
+        work->callback.call<void>(work->errorMsg.c_str(), work->output);
+    } else {
+
+    }
+
+    // Memory cleanup
+    work->callback.reset();
+    delete work;
+}
+
+void GetFileToFileRunner(uv_work_t *order) {
+    WorkerGetFileToFile *work = static_cast< WorkerGetFileToFile * >( order->data );
+
+    try {
+
+        LIBMTP_Get_File_To_File(
+                work->device.m_device, work->fileId, work->path.c_str(),
+                FileProgressCallback,
+                (const void *) &work->callback);
+        work->output = true;
+    }
+    catch (...) {
+        work->error = true;
+        work->errorMsg = "Error occured while downloading files from the device.";
+    }
+}
+
+void
+GetFileToFile(MtpDeviceT device, uint32_t const fileId, const std::string path,
+              nbind::cbFunction &callback) {
+
+
+    WorkerGetFileToFile *work = new WorkerGetFileToFile(device, fileId, path, callback);
+
+    work->worker.data = work;
+    work->device = device;
+    work->fileId = fileId;
+    work->path = path;
+    work->error = false;
+
+    // And save this where you'll be able to call uv_close on it.
+    //  uv_async_t async_data;
+
+    //uv_async_init(uv_default_loop(), &work->worker, some_callback);
+
+    // initialize the thread and pass it async_data
+
+    uv_queue_work(uv_default_loop(), &work->worker, GetFileToFileRunner, GetFileToFileDone);
+}
+
+/*void some_callback(uv_async_t *async_data) {
+    // Note that this depending on the data, you could easily get thread-safety issues
+    // here, so keep in mind that you should follow standard processes here.
+    void *data = async_data->data;
+
+    // Process that data however you need to in order to create a JS value, e.g.
+    // Using NanNew because it is more readable than standard V8.
+    v8::Local <Number> count = NanNew<Number>(data.count);
+
+    v8::Local <v8::Value> argv[] = {
+            count
+    };
+
+    js_callback->Call(NanNull(), 1, argv);
+}*/
+
 
 void Init() {
     LIBMTP_Init();
@@ -1148,7 +1244,7 @@ NBIND_GLOBAL() {
     function(Get_Deviceversion);
     function(GetStorage);// async
     function(GetFilesAndFolders);// async
-    function(Get_File_To_File);
+    function(GetFileToFile);// async
     function(Get_File_To_File_Descriptor);
     function(Get_File_To_Handler);
     function(Send_File_From_File);

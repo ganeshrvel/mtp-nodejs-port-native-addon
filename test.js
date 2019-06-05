@@ -323,12 +323,13 @@ async function run(resetmtp = false, searchDir = null) {
    * Download file tree
    */
 
-  /* const {
+
+  const {
     error: listMtpFileTreeError,
     data: listMtpFileTreeData
   } = await mtpObj.listMtpFileTree({
     folderPath: '/ABCD',
-    recursive: true,
+    recursive: true
   });
 
   if (listMtpFileTreeError) {
@@ -349,12 +350,21 @@ async function run(resetmtp = false, searchDir = null) {
       );
     }
   });
+
   if (downloadFileTreeError) {
+    console.log(`========================`);
+    console.log(`downloadFileTreeError`);
     console.error(downloadFileTreeError);
+    console.log(`========================`);
     return;
   }
 
-  console.log(downloadFileTreeData);*/
+  if (downloadFileTreeData) {
+    console.log(`========================`);
+    console.log(`downloadFileTreeData`);
+    console.log(downloadFileTreeData);
+    console.log(`========================`);
+  }
 
   /**
    * =====================================================================
