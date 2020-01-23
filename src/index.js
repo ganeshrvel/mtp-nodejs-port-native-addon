@@ -1,3 +1,5 @@
+'use strict';
+
 const { basename, dirname, join, resolve, parse } = require('path');
 const {
   existsSync,

@@ -5,11 +5,11 @@
   "description": "MTP Kernel for Node.js - Native addon",
   "main": "src/index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development yarn native-build-dev && yarn run-dev",
-    "run-dev": "node --inspect ./test.js",
-    "native-build-dev": "cross-env NODE_ENV=development autogypi && node-gyp rebuild --debug configure",
-    "native-build-prod": "cross-env NODE_ENV=production node-gyp rebuild",
-    "native-clean": "cross-env NODE_ENV=production node-gyp clean",
+    "dev": "cross-env NODE_ENV=development node --inspect --trace-warnings -r @babel/register ./test.js",
+    "dev-rebuild": "cross-env NODE_ENV=development yarn native-build-dev && yarn dev",
+    "native-build-dev": "autogypi && node-gyp rebuild --debug configure",
+    "native-build-prod": "node-gyp rebuild",
+    "native-clean": "node-gyp clean",
     "lint": "cross-env NODE_ENV=development eslint --cache --format=pretty --ext .js .",
     "lint-fix": "yarn --silent lint --fix; exit 0",
     "postlint-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.*{js,json}'"
@@ -77,6 +77,9 @@
     "eslint-plugin-promise": "^4.0.1",
     "prettier": "^1.16.4",
     "prettier-eslint": "^8.8.2",
-    "yarn": "^1.9.2"
+    "yarn": "^1.9.2",
+    "webpack": "^4.16.3",
+    "webpack-cli": "^3.1.0",
+    "webpack-merge": "^4.1.3"
   }
 }

@@ -1,5 +1,7 @@
 /* eslint global-require: off */
 
+'use strict';
+
 const developmentEnvironments = ['development', 'test'];
 const developmentPlugins = [];
 const productionPlugins = [require('babel-plugin-dev-expression')];
@@ -13,8 +15,10 @@ module.exports = api => {
         require('@babel/preset-env'),
         {
           targets: {
-            edge: '11'
-          }
+            node: '10.16'
+          },
+          corejs: '2',
+          useBuiltIns: 'usage'
         }
       ]
     ],

@@ -1,3 +1,5 @@
+'use strict';
+
 const MTP = require('./src').MTP;
 const findLodash = require('lodash/find');
 const MTP_FLAGS = require('./src/mtp-device-flags').FLAGS;

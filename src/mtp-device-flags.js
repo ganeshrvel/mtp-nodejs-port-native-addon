@@ -1,3 +1,5 @@
+'use strict';
+
 const FLAGS = {
   STORAGE_SORTBY_NOTSORTED: 0,
   STORAGE_SORTBY_FREESPACE: 1,
