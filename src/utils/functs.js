@@ -1,5 +1,5 @@
 import mkdirp from 'mkdirp';
-import { parse } from 'path';
+import pathParse from 'path-parse';
 import { accessSync, R_OK, W_OK } from 'fs';
 
 export const undefinedOrNull = _var => {
@@ -49,7 +49,7 @@ export const getExtension = (fileName, isFolder) => {
 };
 
 export const pathInfo = filePath => {
-  return parse(filePath);
+  return pathParse(filePath);
 };
 
 export const promisifiedMkdir = ({ newFolderPath }) => {

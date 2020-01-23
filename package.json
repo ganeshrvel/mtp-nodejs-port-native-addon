@@ -42,7 +42,8 @@
     "lodash.find": "^4.6.0",
     "mkdirp": "^0.5.1",
     "nbind": "^0.3.6",
-    "node-gyp": "^3.3.1"
+    "node-gyp": "^3.3.1",
+    "path-parse": "^1.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
