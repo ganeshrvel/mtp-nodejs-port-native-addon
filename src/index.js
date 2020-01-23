@@ -1,8 +1,12 @@
-'use strict';
-
-
 const { basename, dirname, join, resolve, parse } = require('path');
-const { existsSync, lstatSync, accessSync, readdirSync, R_OK, W_OK } = require('fs');
+const {
+  existsSync,
+  lstatSync,
+  accessSync,
+  readdirSync,
+  R_OK,
+  W_OK
+} = require('fs');
 const mkdirp = require('mkdirp');
 const moment = require('moment');
 const junk = require('junk');
@@ -259,7 +263,7 @@ class MTP_KERNEL {
       } else {
         const selectedStorageDeviceId = Object.keys(listStorageDevicesData)[
           storageIndex
-          ];
+        ];
 
         this.storageId = !undefinedOrNull(selectedStorageDeviceId)
           ? selectedStorageDeviceId
@@ -651,10 +655,10 @@ class MTP_KERNEL {
    * @returns {Promise<{data: *, error: *}>}
    */
   async createFolder({
-                       newFolderPath = null,
-                       parentId = null,
-                       newFolderName = null
-                     }) {
+    newFolderPath = null,
+    parentId = null,
+    newFolderName = null
+  }) {
     if (!this.device) return this.throwMtpError();
 
     let _parentId = parentId;
@@ -758,10 +762,10 @@ class MTP_KERNEL {
    * @returns {Promise<{data: *, error: *}>}
    */
   async listMtpFileTree({
-                          folderPath = null,
-                          recursive = false,
-                          ignoreHiddenFiles = false
-                        }) {
+    folderPath = null,
+    recursive = false,
+    ignoreHiddenFiles = false
+  }) {
     const filePath = resolve(folderPath);
 
     const {
@@ -819,12 +823,12 @@ class MTP_KERNEL {
    * @returns {Promise<{data: *, error: *}>}
    */
   async __listMtpFileTree({
-                            folderId,
-                            recursive = false,
-                            fileTreeStructure = [],
-                            parentPath = '',
-                            ignoreHiddenFiles = false
-                          }) {
+    folderId,
+    recursive = false,
+    fileTreeStructure = [],
+    parentPath = '',
+    ignoreHiddenFiles = false
+  }) {
     if (!this.device) return this.throwMtpError();
 
     try {
@@ -894,10 +898,10 @@ class MTP_KERNEL {
    * @returns {Promise<{data: *, error: *}>}
    */
   async listLocalFileTree({
-                            filePath,
-                            recursive = false,
-                            fileTreeStructure = []
-                          }) {
+    filePath,
+    recursive = false,
+    fileTreeStructure = []
+  }) {
     if (!this.device) return this.throwMtpError();
 
     try {
@@ -1025,11 +1029,11 @@ class MTP_KERNEL {
    * @returns {Promise<{data: *, error: *}>}
    */
   async downloadFileTree({
-                           rootNode = false,
-                           nodes,
-                           destinationFilePath,
-                           callback
-                         }) {
+    rootNode = false,
+    nodes,
+    destinationFilePath,
+    callback
+  }) {
     if (!this.device) return this.throwMtpError();
 
     try {
@@ -1200,12 +1204,12 @@ class MTP_KERNEL {
    * @returns {Promise<{data: *, error: *}>}
    */
   async uploadFileTree({
-                         rootNode = false,
-                         nodes,
-                         destinationFilePath = null,
-                         callback,
-                         parentId = null
-                       }) {
+    rootNode = false,
+    nodes,
+    destinationFilePath = null,
+    callback,
+    parentId = null
+  }) {
     if (!this.device) return this.throwMtpError();
 
     let _parentId = parentId;

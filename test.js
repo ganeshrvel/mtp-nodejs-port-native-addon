@@ -1,9 +1,6 @@
-'use strict';
-
-
-const MTP = require('./lib').MTP;
+const MTP = require('./src').MTP;
 const findLodash = require('lodash/find');
-const MTP_FLAGS = require('./lib/mtp-device-flags').FLAGS;
+const MTP_FLAGS = require('./src/mtp-device-flags').FLAGS;
 
 const mtpObj = new MTP();
 mtpObj.init();
