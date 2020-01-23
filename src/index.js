@@ -2,7 +2,8 @@ import { cliOptions, cliArgsDictionary } from './utils/cli';
 
 import MTP_KERNEL from './classes/mtp-kernel';
 import MTP_DEVICE_FLAGS from './constants/mtp-device-flags';
-import { inArray } from './utils/functs';
+import { inArray, isArray, undefinedOrNull } from './utils/functs';
+import { releaseDevice } from './device/release';
 
 const cliOptionsKeysList = Object.keys(cliOptions);
 
@@ -21,12 +22,17 @@ if (!cliOptionsKeysList || cliOptionsKeysList.length < 1) {
     console.info(a);
   });
 } else {
+  const mtpObj = new MTP_KERNEL();
+
+  mtpObj.init();
+
   for (let i = 0; i < cliOptionsKeysList.length; i += 1) {
     const key = cliOptionsKeysList[i];
-    const value = cliOptions[key];
-    const arg = value[0] ?? null;
+    const value = isArray(cliOptions[key])
+      ? cliOptions[key][0]
+      : cliOptions[key];
 
-    if (inArray(['_unknown'], key) || inArray(['_unknown', null], arg)) {
+    if (inArray(cliOptionsKeysList, '_unknown') || undefinedOrNull(value)) {
       console.info('Unknown argument, available options:');
       availableOptions().map(a => {
         console.info(a);
@@ -35,12 +41,19 @@ if (!cliOptionsKeysList || cliOptionsKeysList.length < 1) {
       break;
     }
 
-    if (inArray(['storage'], arg)) {
-      console.log('storage');
+    // Initialize MTP Kernel
+
+    if (key === 'storage') {
+      console.log('key => ', key);
+      console.log('value => ', value);
     }
 
-    if (inArray(['storage-list'], arg)) {
-      console.log('storage-list');
+    if (key === 'storage-list') {
+      console.log('key => ', key);
+      console.log('value => ', value);
     }
   }
+
+  // Release the MTP device
+  releaseDevice(mtpObj);
 }

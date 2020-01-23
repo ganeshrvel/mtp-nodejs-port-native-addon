@@ -1,5 +1,3 @@
-'use strict';
-
 import cliArgs from 'command-line-args';
 
 export const cliArgsDictionary = [
