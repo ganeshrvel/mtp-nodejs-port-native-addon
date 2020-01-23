@@ -9,12 +9,13 @@ const baseConfig = {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js)?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
-        options: {
-          presets: [],
-          cacheDirectory: true
+        use: {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true
+          }
         }
       }
     ]
