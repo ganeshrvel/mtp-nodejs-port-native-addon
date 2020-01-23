@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports.MTP_ERROR_FLAGS = {
+export const MTP_ERROR_FLAGS = {
   NO_MTP: `No MTP device found`,
   NO_STORAGE: `MTP storage not accessible`,
   LOCAL_FOLDER_NOT_FOUND: `Source folder not found`,

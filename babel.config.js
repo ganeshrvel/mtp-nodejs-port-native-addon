@@ -1,7 +1,5 @@
 /* eslint global-require: off */
 
-'use strict';
-
 const developmentEnvironments = ['development', 'test'];
 const developmentPlugins = [];
 const productionPlugins = [require('babel-plugin-dev-expression')];

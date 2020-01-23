@@ -1,5 +1,3 @@
-'use strict';
-
 const merge = require('webpack-merge');
 const devConfig = require('./webpack.config.dev');
 const prodConfig = require('./webpack.config.prod');

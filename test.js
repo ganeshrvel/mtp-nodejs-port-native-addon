@@ -1,10 +1,10 @@
-'use strict';
+import findLodash from 'lodash.find';
 
-const MTP = require('./src').MTP;
-const findLodash = require('lodash/find');
-const MTP_FLAGS = require('./src/mtp-device-flags').FLAGS;
+import MTP_KERNEL from './src';
+import MTP_DEVICE_FLAGS from './src/mtp-device-flags';
 
-const mtpObj = new MTP();
+const mtpObj = new MTP_KERNEL();
+
 mtpObj.init();
 
 async function run(resetmtp = false, searchDir = null) {
@@ -19,6 +19,7 @@ async function run(resetmtp = false, searchDir = null) {
 
   if (detectMtpError) {
     console.error(detectMtpError);
+
     return;
   }
 
@@ -33,6 +34,7 @@ async function run(resetmtp = false, searchDir = null) {
 
   if (setStorageDevicesError) {
     console.error(setStorageDevicesError);
+
     return;
   }
 
@@ -41,7 +43,7 @@ async function run(resetmtp = false, searchDir = null) {
       error: listMtpFileTreeError,
       data: listMtpFileTreeData
     } = await mtpObj.listMtpFileTree({
-      folderId: MTP_FLAGS.FILES_AND_FOLDERS_ROOT,
+      folderId: MTP_DEVICE_FLAGS.FILES_AND_FOLDERS_ROOT,
       recursive: false
     });
 
@@ -86,14 +88,16 @@ async function run(resetmtp = false, searchDir = null) {
     error: listMtpFileTreeError,
     data: listMtpFileTreeData
   } = await mtpObj.listMtpFileTree({
-    recursive: true,
-    folderPath: '/ABCD'
+    recursive: false,
+    folderPath: '/a'
   });
 
   if (listMtpFileTreeError) {
     console.error(listMtpFileTreeError);
+
     return;
   }
+
   console.log(listMtpFileTreeData);
 
   /**

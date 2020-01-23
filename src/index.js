@@ -1,85 +1,25 @@
-'use strict';
-
-const { basename, dirname, join, resolve, parse } = require('path');
-const {
-  existsSync,
-  lstatSync,
-  accessSync,
-  readdirSync,
-  R_OK,
-  W_OK
-} = require('fs');
-const mkdirp = require('mkdirp');
-const moment = require('moment');
-const junk = require('junk');
-const findLodash = require('lodash/find');
-const mtpNativeModule = require('./mtp-helper');
-const { MTP_ERROR_FLAGS } = require('./mtp-error-flags');
-const { FLAGS: MTP_FLAGS } = require('./mtp-device-flags');
-
-function undefinedOrNull(_var) {
-  return typeof _var === 'undefined' || _var === null;
-}
-
-function quickHash(str) {
-  let hash = 0;
-  let i;
-  let chr;
-
-  if (str.length === 0) {
-    return hash;
-  }
-  for (i = 0; i < str.length; i += 1) {
-    chr = str.charCodeAt(i);
-    hash = (hash << 5) - hash + chr; // eslint-disable-line no-bitwise
-    hash |= 0; // eslint-disable-line no-bitwise
-  }
-  return hash;
-}
-
-function isWritable(folderPath) {
-  try {
-    accessSync(folderPath, R_OK | W_OK);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-function isArray(n) {
-  return Array.isArray(n);
-}
-
-function getExtension(fileName, isFolder) {
-  if (isFolder) {
-    return null;
-  }
-  const parsedPath = pathInfo(fileName);
-
-  return parsedPath !== null ? parsedPath.ext : null;
-}
-
-function pathInfo(filePath) {
-  return parse(filePath);
-}
-
-async function promisifiedMkdir({ newFolderPath }) {
-  try {
-    return new Promise(resolve => {
-      mkdirp(newFolderPath, error => {
-        resolve({ data: null, stderr: error, error });
-      });
-    });
-  } catch (e) {
-    console.error(e);
-  }
-}
+import { basename, dirname, join, resolve } from 'path';
+import { existsSync, lstatSync, readdirSync } from 'fs';
+import dayjs from 'dayjs';
+import junk from 'junk';
+import findLodash from 'lodash.find';
+import { mtpNativeModule } from './mtp-helper';
+import { MTP_ERROR_FLAGS } from './mtp-error-flags';
+import { MTP_DEVICE_FLAGS } from './mtp-device-flags';
+import {
+  getExtension,
+  isArray,
+  isWritable,
+  promisifiedMkdir,
+  quickHash,
+  undefinedOrNull
+} from './utils/functs';
 
 /**
  * MTP Class
  */
 
-class MTP_KERNEL {
+export default class MTP_KERNEL {
   /**
    * constructor
    */
@@ -198,7 +138,7 @@ class MTP_KERNEL {
     try {
       this.mtpNativeModule.Get_Storage(
         this.device,
-        MTP_FLAGS.STORAGE_SORTBY_NOTSORTED
+        MTP_DEVICE_FLAGS.STORAGE_SORTBY_NOTSORTED
       );
 
       const storageList = this.device.getStorages();
@@ -313,6 +253,7 @@ class MTP_KERNEL {
     try {
       this.mtpNativeModule.Release_Device(this.device);
       this.device = null;
+
       return Promise.resolve({
         data: true,
         error: null
@@ -399,7 +340,7 @@ class MTP_KERNEL {
       }
 
       const _filePath = resolve(filePath);
-      const rootPathProps = { id: MTP_FLAGS.FILES_AND_FOLDERS_ROOT };
+      const rootPathProps = { id: MTP_DEVICE_FLAGS.FILES_AND_FOLDERS_ROOT };
 
       if (_filePath === '/') {
         return Promise.resolve({
@@ -507,6 +448,7 @@ class MTP_KERNEL {
       }
 
       const foundItem = findLodash(listMtpFileTreeData, { name: fileName });
+
       if (!foundItem) {
         return Promise.resolve({
           data: false,
@@ -552,6 +494,7 @@ class MTP_KERNEL {
             error: resolvePathError
           });
         }
+
         _fileId = resolvePathData.id;
       }
 
@@ -607,11 +550,13 @@ class MTP_KERNEL {
             error: resolvePathError
           });
         }
+
         _fileId = resolvePathData.id;
       }
 
       // eslint-disable-next-line new-cap
       const file = new this.mtpNativeModule.file_t();
+
       file.id = _fileId;
       file.storageId = this.storageId;
 
@@ -671,6 +616,7 @@ class MTP_KERNEL {
 
       if (!undefinedOrNull(newFolderPath)) {
         const _newFolderPath = resolve(newFolderPath);
+
         _newFolderName = basename(_newFolderPath);
         const parentPath = dirname(_newFolderPath);
 
@@ -784,7 +730,7 @@ class MTP_KERNEL {
 
     if (
       !resolvePathData.isFolder &&
-      resolvePathData.id !== MTP_FLAGS.FILES_AND_FOLDERS_ROOT
+      resolvePathData.id !== MTP_DEVICE_FLAGS.FILES_AND_FOLDERS_ROOT
     ) {
       return Promise.resolve({
         data: resolvePathData,
@@ -801,6 +747,7 @@ class MTP_KERNEL {
       folderId: resolvePathData.id,
       parentPath: filePath
     });
+
     if (listMtpFileTreeError) {
       return Promise.resolve({
         data: null,
@@ -849,7 +796,7 @@ class MTP_KERNEL {
         }
 
         const fullPath = join(parentPath, file.name);
-        const isFolder = MTP_FLAGS.FILETYPE_FOLDER === file.type;
+        const isFolder = MTP_DEVICE_FLAGS.FILETYPE_FOLDER === file.type;
 
         const fileInfo = {
           id: file.id,
@@ -861,14 +808,14 @@ class MTP_KERNEL {
           storageId: file.storageId,
           path: fullPath,
           extension: getExtension(fullPath, isFolder),
-          dateAdded: moment
+          dateAdded: dayjs
             .unix(file.modificationDate)
             .format('YYYY-MM-DD HH:mm:ss'),
           children: []
         };
         const lastIndex = fileTreeStructure.push(fileInfo) - 1;
 
-        if (MTP_FLAGS.FILETYPE_FOLDER === file.type && recursive) {
+        if (MTP_DEVICE_FLAGS.FILETYPE_FOLDER === file.type && recursive) {
           await this.__listMtpFileTree({
             folderId: file.id,
             recursive,
@@ -916,6 +863,7 @@ class MTP_KERNEL {
 
       const filePathStats = lstatSync(filePath);
       const isFolder = filePathStats.isDirectory();
+
       if (!filePathStats.isDirectory()) {
         const file = basename(filePath);
         const fullPath = filePath;
@@ -935,6 +883,7 @@ class MTP_KERNEL {
       }
 
       const files = readdirSync(filePath);
+
       for (let i = 0; i < files.length; i += 1) {
         const file = files[i];
 
@@ -1158,9 +1107,10 @@ class MTP_KERNEL {
     try {
       // eslint-disable-next-line new-cap
       const file = new this.mtpNativeModule.file_t();
+
       file.size = size;
       file.name = basename(filePath);
-      file.type = MTP_FLAGS.FILETYPE_UNKNOWN;
+      file.type = MTP_DEVICE_FLAGS.FILETYPE_UNKNOWN;
       file.parentId = parentId;
       file.storageId = this.storageId;
 
@@ -1234,6 +1184,7 @@ class MTP_KERNEL {
             error: resolvePathError
           });
         }
+
         _parentId = resolvePathData.id;
 
         if (!isFile) {
@@ -1350,5 +1301,3 @@ class MTP_KERNEL {
     }
   }
 }
-
-module.exports.MTP = MTP_KERNEL;

@@ -1,6 +1,7 @@
 module.exports = {
   env: {
-    node: true
+    node: true,
+    es6: true
   },
   extends: ['plugin:prettier/recommended'],
   plugins: ['import', 'promise', 'compat', 'prettier'],
@@ -28,6 +29,10 @@ module.exports = {
     'import/no-named-as-default': 0,
     'import/no-named-as-default-member': 0,
     'import/no-unresolved': 'error',
+    'import/order': [
+      'error',
+      { groups: [['builtin', 'external', 'internal']] }
+    ],
     'import/prefer-default-export': 'off',
     'no-async-promise-executor': 'off',
     'no-console': [
@@ -40,14 +45,7 @@ module.exports = {
     'no-shadow': 'off',
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
-    'no-unused-vars': [
-      'error',
-      {
-        args: 'after-used',
-        argsIgnorePattern: '^(_)',
-        varsIgnorePattern: ''
-      }
-    ],
+    'no-unused-vars': ['error'],
     'padding-line-between-statements': [
       'error',
       { blankLine: 'always', prev: '*', next: 'return' },
@@ -61,15 +59,18 @@ module.exports = {
     ],
     'no-return-await': 0,
     'no-nested-ternary': 0,
+    'no-undef': 'error',
     'prettier/prettier': ['error', { singleQuote: true }],
     'promise/always-return': 0,
     'promise/catch-or-return': 0,
     'promise/no-native': 'off',
-    'promise/param-names': 'error',
-    strict: 'off'
+    'promise/param-names': 'error'
   },
   parserOptions: {
     ecmaVersion: 6,
-    sourceType: 'module'
+    sourceType: 'module',
+    ecmaFeatures: {
+      experimentalObjectRestSpread: true
+    }
   }
 };
