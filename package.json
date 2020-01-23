@@ -5,11 +5,14 @@
   "description": "MTP Kernel for Node.js - Native addon",
   "main": "src/index.js",
   "scripts": {
-    "dev": "yarn native-build-dev && yarn run-dev",
+    "dev": "cross-env NODE_ENV=development yarn native-build-dev && yarn run-dev",
     "run-dev": "node --inspect ./test.js",
-    "native-build-dev": "autogypi && node-gyp rebuild --debug configure",
-    "native-build-prod": "node-gyp rebuild",
-    "native-clean": "node-gyp clean"
+    "native-build-dev": "cross-env NODE_ENV=development autogypi && node-gyp rebuild --debug configure",
+    "native-build-prod": "cross-env NODE_ENV=production node-gyp rebuild",
+    "native-clean": "cross-env NODE_ENV=production node-gyp clean",
+    "lint": "cross-env NODE_ENV=development eslint --cache --format=pretty --ext .js .",
+    "lint-fix": "yarn --silent lint --fix; exit 0",
+    "postlint-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.*{js,json}'"
   },
   "keywords": [
     "openmtp",
