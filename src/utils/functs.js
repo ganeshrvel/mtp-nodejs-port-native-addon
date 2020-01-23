@@ -63,3 +63,17 @@ export const promisifiedMkdir = ({ newFolderPath }) => {
     console.error(e);
   }
 };
+
+export const arrayIntersection = (array1, array2) => {
+  return array1.filter(x => array2.includes(x));
+};
+
+export const inArray = (array, value) => {
+  if (isArray(value)) {
+    const diff = arrayIntersection(array, value);
+
+    return diff && diff.length > 0;
+  }
+
+  return array.indexOf(value) > -1;
+};

@@ -3,6 +3,7 @@ module.exports = {
     node: true,
     es6: true
   },
+  parser: 'babel-eslint',
   extends: ['plugin:prettier/recommended'],
   plugins: ['import', 'promise', 'compat', 'prettier'],
   rules: {
