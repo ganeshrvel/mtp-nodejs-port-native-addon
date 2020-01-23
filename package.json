@@ -5,7 +5,7 @@
   "description": "MTP Kernel for Node.js - Native addon",
   "main": "src/index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development node --inspect --trace-warnings -r @babel/register ./test.js",
+    "dev": "cross-env NODE_ENV=development node --inspect --trace-warnings -r @babel/register src/index.js",
     "dev-rebuild": "cross-env NODE_ENV=development yarn native-build-dev && yarn dev",
     "native-build-dev": "autogypi && node-gyp rebuild --debug configure",
     "native-build-prod": "node-gyp rebuild",
