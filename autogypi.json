@@ -1,5 +1,4 @@
 {
   "dependencies": ["nbind"],
-  "includes": [],
-  "include_dirs": ["libmtp.mpd\\src"]
+  "includes": []
 }

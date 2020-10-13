@@ -5,10 +5,10 @@
   "description": "MTP Kernel for Node.js - Native addon",
   "main": "src/index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development node --inspect --trace-warnings -r @babel/register src/index.js",
-    "dev-rebuild": "cross-env NODE_ENV=development yarn native-build-dev && yarn dev",
+    "run-js": "cross-env NODE_ENV=development node --trace-warnings -r @babel/register src/index1.js --storage-list",
+    "dev-rebuild": "cross-env NODE_ENV=development yarn native-build-dev && yarn run-js",
     "native-build-dev": "autogypi && node-gyp rebuild --debug configure",
-    "native-build-prod": "node-gyp rebuild",
+    "native-build-prod": "autogypi && node-gyp rebuild",
     "native-clean": "node-gyp clean",
     "package-macos": "pkg dist/index.js --target node10-macos-x64",
     "bundle-js": "cross-env NODE_ENV=production webpack --config webpack/webpack.config.base.js",
@@ -42,8 +42,8 @@
     "junk": "^2.1.0",
     "lodash.find": "^4.6.0",
     "mkdirp": "^0.5.1",
-    "nbind": "^0.3.6",
-    "node-gyp": "^3.3.1",
+    "nbind": "^0.3.15",
+    "node-gyp": "^6.1.0",
     "path-parse": "^1.0.6"
   },
   "devDependencies": {

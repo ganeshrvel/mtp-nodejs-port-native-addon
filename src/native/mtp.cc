@@ -12,11 +12,17 @@
 #endif
 
 #include "nbind/nbind.h"
-#include "libmtp.h"
+
+extern "C" {
+	#include "libmtp.h"
+}
+
 
 #ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #endif
+
+extern "C" void LIBMTP_Init(void);
 
 class databuffer_t {
 public:
